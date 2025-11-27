@@ -5,3 +5,7 @@ max_concurrent_requests = 4
 [[domains]]
 name = "xkcd.com"
 max_concurrent_requests = 2
+
+[[domains]]
+name = "govinfo.gov"
+max_concurrent_requests = 1
