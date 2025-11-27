@@ -3,6 +3,7 @@ package org.github.sguzman.rss.config
 import cats.effect.Sync
 import cats.syntax.all.*
 import org.github.sguzman.rss.model.*
+import os.*
 import toml.Toml
 import toml.derivation.auto.*
 
@@ -31,16 +32,17 @@ final case class RawConfig(
 )
 
 object ConfigLoader {
-  def load[F[_]: Sync](path: os.Path): F[AppConfig] =
-    for
+  def load[F[_]: Sync](path: os.Path): F[AppConfig] = {
+    for {
       rawContent <- Sync[F].blocking(os.read(path))
       parsed <- Sync[F]
         .fromEither(Toml.parseAs[RawConfig](rawContent).leftMap(err => new RuntimeException(err.toString)))
         .adaptError { case e => new RuntimeException(s"TOML parse error: ${e.getMessage}", e) }
       cfg <- Sync[F].delay(toAppConfig(parsed, path))
-    yield cfg
+    } yield cfg
+  }
 
-  private def toAppConfig(raw: RawConfig, path: os.Path): AppConfig =
+  private def toAppConfig(raw: RawConfig, path: os.Path): AppConfig = {
     val feeds = raw.feeds.map { f =>
       val uri = URI(f.url)
       val domain = Option(uri.getHost).getOrElse(throw new IllegalArgumentException(s"Feed ${f.id} missing host"))
@@ -52,8 +54,14 @@ object ConfigLoader {
       )
     }
     val mode = parseMode(raw.app.mode)
-    val configDir = path / os.up
-    val dbOsPath = os.Path(raw.app.db_path, base = configDir)
+    val baseDir =
+      try {
+        val rel = path.relativeTo(os.pwd)
+        if rel.segments.contains("resources") then os.pwd else path / os.up
+      } catch {
+        case _: IllegalArgumentException => path / os.up
+      }
+    val dbOsPath = os.Path(raw.app.db_path, base = baseDir)
     AppConfig(
       dbPath = dbOsPath.toNIO,
       defaultPollSeconds = raw.app.default_poll_seconds,
@@ -67,11 +75,13 @@ object ConfigLoader {
       domains = raw.domains.getOrElse(Map.empty).view.mapValues(d => DomainConfig(d.max_concurrent_requests)).toMap,
       feeds = feeds
     )
+  }
 
   private def parseMode(rawMode: Option[String]): AppMode =
-    rawMode.map(_.toLowerCase) match
+    rawMode.map(_.toLowerCase) match {
       case None | Some("prod") => AppMode.Prod
       case Some("dev")         => AppMode.Dev
       case Some(other) =>
         throw IllegalArgumentException(s"Invalid app.mode '$other' in config. Expected 'dev' or 'prod'.")
+    }
 }
