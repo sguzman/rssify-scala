@@ -1,5 +1,9 @@
 val scala3Version = "3.7.3"
 
+ThisBuild / javaOptions ++= Seq(
+  "--enable-native-access=ALL-UNNAMED"
+)
+
 Compile / run / fork := true
 
 lazy val root = project
