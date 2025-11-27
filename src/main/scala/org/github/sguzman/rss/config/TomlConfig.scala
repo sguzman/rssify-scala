@@ -18,7 +18,8 @@ final case class RawApp(
     max_error_backoff_seconds: Int,
     jitter_fraction: Double,
     global_max_concurrent_requests: Option[Int],
-    user_agent: String
+    user_agent: String,
+    mode: Option[String] = None
 )
 
 final case class RawDomain(max_concurrent_requests: Int)
@@ -52,6 +53,7 @@ object ConfigLoader:
         basePollSeconds = f.base_poll_seconds.getOrElse(raw.app.default_poll_seconds)
       )
     }
+    val mode = parseMode(raw.app.mode)
     AppConfig(
       dbPath = path.getParent match
         case null => Path.of(raw.app.db_path)
@@ -63,6 +65,14 @@ object ConfigLoader:
       jitterFraction = raw.app.jitter_fraction,
       globalMaxConcurrentRequests = raw.app.global_max_concurrent_requests,
       userAgent = raw.app.user_agent,
+      mode = mode,
       domains = raw.domains.getOrElse(Map.empty).view.mapValues(d => DomainConfig(d.max_concurrent_requests)).toMap,
       feeds = feeds
     )
+
+  private def parseMode(rawMode: Option[String]): AppMode =
+    rawMode.map(_.toLowerCase) match
+      case None | Some("prod") => AppMode.Prod
+      case Some("dev")         => AppMode.Dev
+      case Some(other) =>
+        throw IllegalArgumentException(s"Invalid app.mode '$other' in config. Expected 'dev' or 'prod'.")

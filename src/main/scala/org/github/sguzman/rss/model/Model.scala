@@ -20,6 +20,9 @@ final case class FeedConfig(
     basePollSeconds: Int
 )
 
+enum AppMode:
+  case Dev, Prod
+
 final case class AppConfig(
     dbPath: Path,
     defaultPollSeconds: Int,
@@ -29,6 +32,7 @@ final case class AppConfig(
     jitterFraction: Double,
     globalMaxConcurrentRequests: Option[Int],
     userAgent: String,
+    mode: AppMode,
     domains: Map[String, DomainConfig],
     feeds: List[FeedConfig]
 )

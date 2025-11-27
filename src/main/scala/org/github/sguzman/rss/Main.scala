@@ -6,9 +6,11 @@ import org.github.sguzman.rss.Logging.given
 import org.github.sguzman.rss.config.ConfigLoader
 import org.github.sguzman.rss.db.Database
 import org.github.sguzman.rss.http.HttpClient
+import org.github.sguzman.rss.model.AppMode
 import org.github.sguzman.rss.runtime.Scheduler
 import org.typelevel.log4cats.Logger
 
+import java.nio.file.Files
 import java.nio.file.Path
 
 object Main extends IOApp:
@@ -16,8 +18,9 @@ object Main extends IOApp:
     val cfgPath = args.headOption.fold(Path.of("rss-config.toml"))(Path.of(_))
     val program = for
       cfg <- ConfigLoader.load[IO](cfgPath)
+      _ <- resetDbIfDev(cfg)
       _ <- Logger[IO].info(
-        s"Loaded config for ${cfg.feeds.size} feeds, db=${cfg.dbPath}"
+        s"Loaded config for ${cfg.feeds.size} feeds, db=${cfg.dbPath}, mode=${cfg.mode}"
       )
       _ <- Database.transactor[IO](cfg).use { xa =>
         for
@@ -36,3 +39,10 @@ object Main extends IOApp:
         ExitCode.Error
       )
     }
+
+  private def resetDbIfDev(cfg: org.github.sguzman.rss.model.AppConfig): IO[Unit] =
+    cfg.mode match
+      case AppMode.Dev =>
+        Logger[IO].warn(s"Dev mode enabled, deleting database at ${cfg.dbPath}") *>
+          IO.blocking(Files.deleteIfExists(cfg.dbPath)).void
+      case AppMode.Prod => IO.unit
