@@ -1,5 +1,7 @@
 val scala3Version = "3.7.3"
 
+Compile / run / fork := true
+
 lazy val root = project
   .in(file("."))
   .settings(
