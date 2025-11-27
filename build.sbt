@@ -8,6 +8,7 @@ lazy val root = project
     scalaVersion := scala3Version,
     ThisBuild / organization := "org.github.sguzman",
     libraryDependencies ++= Seq(
+      "com.lihaoyi" %% "os-lib" % "0.11.6",
       "org.typelevel" %% "cats-effect" % "3.6.3",
       "co.fs2" %% "fs2-core" % "3.12.2",
       "org.http4s" %% "http4s-ember-client" % "0.23.32",

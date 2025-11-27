@@ -1,7 +1,6 @@
 package org.github.sguzman.rss
 
-import cats.effect.{ExitCode, IO, IOApp, Resource}
-import cats.syntax.all._
+import cats.effect.{ExitCode, IO, IOApp}
 import org.github.sguzman.rss.Logging.given
 import org.github.sguzman.rss.config.ConfigLoader
 import org.github.sguzman.rss.db.Database
@@ -10,12 +9,12 @@ import org.github.sguzman.rss.model.AppMode
 import org.github.sguzman.rss.runtime.Scheduler
 import org.typelevel.log4cats.Logger
 
-import java.nio.file.Files
-import java.nio.file.Path
-
-object Main extends IOApp:
-  def run(args: List[String]): IO[ExitCode] =
-    val cfgPath = args.headOption.fold(Path.of("rss-config.toml"))(Path.of(_))
+object Main extends IOApp {
+  def run(args: List[String]): IO[ExitCode] = {
+    val defaultConfigPath = os.pwd / "src" / "main" / "resources" / "config.toml"
+    val cfgPath = args.headOption
+      .map(p => os.Path(p, base = os.pwd))
+      .getOrElse(defaultConfigPath)
     val program = for
       cfg <- ConfigLoader.load[IO](cfgPath)
       _ <- resetDbIfDev(cfg)
@@ -39,10 +38,15 @@ object Main extends IOApp:
         ExitCode.Error
       )
     }
+  }
 
   private def resetDbIfDev(cfg: org.github.sguzman.rss.model.AppConfig): IO[Unit] =
     cfg.mode match
       case AppMode.Dev =>
+        val dbOsPath = os.Path(cfg.dbPath.toString)
         Logger[IO].warn(s"Dev mode enabled, deleting database at ${cfg.dbPath}") *>
-          IO.blocking(Files.deleteIfExists(cfg.dbPath)).void
+          IO.blocking {
+            if os.exists(dbOsPath) then os.remove(dbOsPath)
+          }.void
       case AppMode.Prod => IO.unit
+}

@@ -31,3 +31,7 @@ metals.sbt
 .idea_modules
 /.worksheet/
 *.db
+.ivy2/
+.sbt-global/
+.sbtboot/
+
