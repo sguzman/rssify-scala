@@ -1,7 +1,7 @@
 package org.github.sguzman.rss
 
 import cats.effect.{ExitCode, IO, IOApp, Resource}
-import cats.syntax.all.*
+import cats.syntax.all._
 import org.github.sguzman.rss.Logging.given
 import org.github.sguzman.rss.config.ConfigLoader
 import org.github.sguzman.rss.db.Database
@@ -16,7 +16,9 @@ object Main extends IOApp:
     val cfgPath = args.headOption.fold(Path.of("rss-config.toml"))(Path.of(_))
     val program = for
       cfg <- ConfigLoader.load[IO](cfgPath)
-      _ <- Logger[IO].info(s"Loaded config for ${cfg.feeds.size} feeds, db=${cfg.dbPath}")
+      _ <- Logger[IO].info(
+        s"Loaded config for ${cfg.feeds.size} feeds, db=${cfg.dbPath}"
+      )
       _ <- Database.transactor[IO](cfg).use { xa =>
         for
           _ <- Database.migrate(xa)
@@ -30,5 +32,7 @@ object Main extends IOApp:
     yield ExitCode.Success
 
     program.handleErrorWith { err =>
-      Logger[IO].error(err)(s"Fatal error: ${err.getMessage}") *> IO.pure(ExitCode.Error)
+      Logger[IO].error(err)(s"Fatal error: ${err.getMessage}") *> IO.pure(
+        ExitCode.Error
+      )
     }
