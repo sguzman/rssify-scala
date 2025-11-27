@@ -1,0 +1,9 @@
+[[feeds]]
+id = "hn-frontpage"
+url = "https://hnrss.org/frontpage"
+base_poll_seconds = 120
+
+[[feeds]]
+id = "xkcd"
+url = "https://xkcd.com/rss.xml"
+base_poll_seconds = 180

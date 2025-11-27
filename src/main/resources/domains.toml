@@ -1,0 +1,7 @@
+[[domains]]
+name = "hnrss.org"
+max_concurrent_requests = 4
+
+[[domains]]
+name = "xkcd.com"
+max_concurrent_requests = 2

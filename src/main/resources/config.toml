@@ -8,19 +8,3 @@ jitter_fraction = 0.2
 global_max_concurrent_requests = 16
 user_agent = "ScalaRssFetcher/1.0 (+https://example.org)"
 mode = "dev"
-
-[domains."hnrss.org"]
-max_concurrent_requests = 4
-
-[domains."xkcd.com"]
-max_concurrent_requests = 2
-
-[[feeds]]
-id = "hn-frontpage"
-url = "https://hnrss.org/frontpage"
-base_poll_seconds = 120
-
-[[feeds]]
-id = "xkcd"
-url = "https://xkcd.com/rss.xml"
-base_poll_seconds = 180
