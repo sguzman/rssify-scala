@@ -222,9 +222,8 @@ object LinkState:
     Delay(totalSeconds = total, jitterSeconds = jitterSeconds)
 
   private def isErrorStatus(s: Status): Boolean =
-    s.responseClass match
-      case Status.ResponseClass.ClientError | Status.ResponseClass.ServerError => true
-      case _                                                                   => false
+    val code = s.code
+    code >= 400 && code <= 599
 
 // ----- Helpers -----
 
