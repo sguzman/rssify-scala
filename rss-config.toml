@@ -1,0 +1,25 @@
+[app]
+db_path = "rss.db"
+default_poll_seconds = 100
+max_poll_seconds = 3600
+error_backoff_base_seconds = 30
+max_error_backoff_seconds = 7200
+jitter_fraction = 0.2
+global_max_concurrent_requests = 16
+user_agent = "ScalaRssFetcher/1.0 (+https://example.org)"
+
+[domains."hnrss.org"]
+max_concurrent_requests = 4
+
+[domains."xkcd.com"]
+max_concurrent_requests = 2
+
+[[feeds]]
+id = "hn-frontpage"
+url = "https://hnrss.org/frontpage"
+base_poll_seconds = 120
+
+[[feeds]]
+id = "xkcd"
+url = "https://xkcd.com/rss.xml"
+base_poll_seconds = 180
