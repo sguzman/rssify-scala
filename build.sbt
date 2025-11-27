@@ -17,7 +17,7 @@ lazy val root = project
       "org.xerial" % "sqlite-jdbc" % "3.51.0.0",
       "org.typelevel" %% "log4cats-slf4j" % "2.7.1",
       "ch.qos.logback" % "logback-classic" % "1.5.11",
-      "io.github.indoorvivants" %% "toml-scala" % "0.3.0",
+      "io.github.indoorvivants" %% "toml-scala" % "0.2.2",
       "org.typelevel" %% "munit-cats-effect" % "2.0.0" % Test
     ),
     scalacOptions ++= Seq(
