@@ -7,3 +7,1061 @@ base_poll_seconds = 120
 id = "xkcd"
 url = "https://xkcd.com/rss.xml"
 base_poll_seconds = 180
+
+[[feeds]]
+id = "govinfo-bills"
+url = "https://www.govinfo.gov/rss/bills.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "bills-govinfo-enr"
+url = "https://www.govinfo.gov/rss/bills-enr.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-plaw"
+url = "https://www.govinfo.gov/rss/plaw.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-comps"
+url = "https://www.govinfo.gov/rss/comps.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-statute"
+url = "https://www.govinfo.gov/rss/statute.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-uscode"
+url = "https://www.govinfo.gov/rss/uscode.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-budget"
+url = "https://www.govinfo.gov/rss/budget.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-dcpd"
+url = "https://www.govinfo.gov/rss/dcpd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-erp"
+url = "https://www.govinfo.gov/rss/erp.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-ppp"
+url = "https://www.govinfo.gov/rss/ppp.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-cprt"
+url = "https://www.govinfo.gov/rss/cprt.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-cdoc"
+url = "https://www.govinfo.gov/rss/cdoc.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-chrg"
+url = "https://www.govinfo.gov/rss/chrg.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-crpt"
+url = "https://www.govinfo.gov/rss/crpt.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-serialset"
+url = "https://www.govinfo.gov/rss/serialset.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-cmr"
+url = "https://www.govinfo.gov/rss/cmr.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-econi"
+url = "https://www.govinfo.gov/rss/econi.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-hman"
+url = "https://www.govinfo.gov/rss/hman.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-sman"
+url = "https://www.govinfo.gov/rss/sman.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-cdir"
+url = "https://www.govinfo.gov/rss/cdir.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-govman"
+url = "https://www.govinfo.gov/rss/govman.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "gpo-govinfo-fcc"
+url = "https://www.govinfo.gov/rss/gpo-fcc.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-gaoreports"
+url = "https://www.govinfo.gov/rss/gaoreports.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-ccal"
+url = "https://www.govinfo.gov/rss/ccal.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-crec"
+url = "https://www.govinfo.gov/rss/crec.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-crecb"
+url = "https://www.govinfo.gov/rss/crecb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-cri"
+url = "https://www.govinfo.gov/rss/cri.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-hob"
+url = "https://www.govinfo.gov/rss/hob.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-hjournal"
+url = "https://www.govinfo.gov/rss/hjournal.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-cfr"
+url = "https://www.govinfo.gov/rss/cfr.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-fr"
+url = "https://www.govinfo.gov/rss/fr.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-lsa"
+url = "https://www.govinfo.gov/rss/lsa.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-pai"
+url = "https://www.govinfo.gov/rss/pai.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govinfo-usreports"
+url = "https://www.govinfo.gov/rss/usreports.xml"
+base_poll_seconds = 360
+
+
+[[feeds]]
+id = "uscourts-govinfo-alnd"
+url = "https://www.govinfo.gov/rss/uscourts-alnd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-alsd"
+url = "https://www.govinfo.gov/rss/uscourts-alsd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-almd"
+url = "https://www.govinfo.gov/rss/uscourts-almd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-akd"
+url = "https://www.govinfo.gov/rss/uscourts-akd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-azd"
+url = "https://www.govinfo.gov/rss/uscourts-azd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ared"
+url = "https://www.govinfo.gov/rss/uscourts-ared.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-caed"
+url = "https://www.govinfo.gov/rss/uscourts-caed.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-cand"
+url = "https://www.govinfo.gov/rss/uscourts-cand.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-casd"
+url = "https://www.govinfo.gov/rss/uscourts-casd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-cod"
+url = "https://www.govinfo.gov/rss/uscourts-cod.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ctd"
+url = "https://www.govinfo.gov/rss/uscourts-ctd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-dcd"
+url = "https://www.govinfo.gov/rss/uscourts-dcd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ded"
+url = "https://www.govinfo.gov/rss/uscourts-ded.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-flsd"
+url = "https://www.govinfo.gov/rss/uscourts-flsd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-flnd"
+url = "https://www.govinfo.gov/rss/uscourts-flnd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-gamd"
+url = "https://www.govinfo.gov/rss/uscourts-gamd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-gand"
+url = "https://www.govinfo.gov/rss/uscourts-gand.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-gud"
+url = "https://www.govinfo.gov/rss/uscourts-gud.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-hid"
+url = "https://www.govinfo.gov/rss/uscourts-hid.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-idd"
+url = "https://www.govinfo.gov/rss/uscourts-idd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ilnd"
+url = "https://www.govinfo.gov/rss/uscourts-ilnd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ilsd"
+url = "https://www.govinfo.gov/rss/uscourts-ilsd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-insd"
+url = "https://www.govinfo.gov/rss/uscourts-insd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-iand"
+url = "https://www.govinfo.gov/rss/uscourts-iand.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ksd"
+url = "https://www.govinfo.gov/rss/uscourts-ksd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-kyed"
+url = "https://www.govinfo.gov/rss/uscourts-kyed.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-kywd"
+url = "https://www.govinfo.gov/rss/uscourts-kywd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-laed"
+url = "https://www.govinfo.gov/rss/uscourts-laed.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-lamd"
+url = "https://www.govinfo.gov/rss/uscourts-lamd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-med"
+url = "https://www.govinfo.gov/rss/uscourts-med.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-mdd"
+url = "https://www.govinfo.gov/rss/uscourts-mdd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-mad"
+url = "https://www.govinfo.gov/rss/uscourts-mad.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-mied"
+url = "https://www.govinfo.gov/rss/uscourts-mied.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-miwd"
+url = "https://www.govinfo.gov/rss/uscourts-miwd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-mnd"
+url = "https://www.govinfo.gov/rss/uscourts-mnd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-moed"
+url = "https://www.govinfo.gov/rss/uscourts-moed.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-mowd"
+url = "https://www.govinfo.gov/rss/uscourts-mowd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-mtd"
+url = "https://www.govinfo.gov/rss/uscourts-mtd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ned"
+url = "https://www.govinfo.gov/rss/uscourts-ned.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-nhd"
+url = "https://www.govinfo.gov/rss/uscourts-nhd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-njd"
+url = "https://www.govinfo.gov/rss/uscourts-njd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-nmd"
+url = "https://www.govinfo.gov/rss/uscourts-nmd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-nyed"
+url = "https://www.govinfo.gov/rss/uscourts-nyed.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-nynd"
+url = "https://www.govinfo.gov/rss/uscourts-nynd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ncmd"
+url = "https://www.govinfo.gov/rss/uscourts-ncmd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ncwd"
+url = "https://www.govinfo.gov/rss/uscourts-ncwd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ndd"
+url = "https://www.govinfo.gov/rss/uscourts-ndd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-nmid"
+url = "https://www.govinfo.gov/rss/uscourts-nmid.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ohnd"
+url = "https://www.govinfo.gov/rss/uscourts-ohnd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ohsd"
+url = "https://www.govinfo.gov/rss/uscourts-ohsd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-oked"
+url = "https://www.govinfo.gov/rss/uscourts-oked.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-okwd"
+url = "https://www.govinfo.gov/rss/uscourts-okwd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ord"
+url = "https://www.govinfo.gov/rss/uscourts-ord.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-paed"
+url = "https://www.govinfo.gov/rss/uscourts-paed.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-pamd"
+url = "https://www.govinfo.gov/rss/uscourts-pamd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-pawd"
+url = "https://www.govinfo.gov/rss/uscourts-pawd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-prd"
+url = "https://www.govinfo.gov/rss/uscourts-prd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-rid"
+url = "https://www.govinfo.gov/rss/uscourts-rid.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-sdd"
+url = "https://www.govinfo.gov/rss/uscourts-sdd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-tned"
+url = "https://www.govinfo.gov/rss/uscourts-tned.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-tnwd"
+url = "https://www.govinfo.gov/rss/uscourts-tnwd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-tnmd"
+url = "https://www.govinfo.gov/rss/uscourts-tnmd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-txed"
+url = "https://www.govinfo.gov/rss/uscourts-txed.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-txnd"
+url = "https://www.govinfo.gov/rss/uscourts-txnd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-txsd"
+url = "https://www.govinfo.gov/rss/uscourts-txsd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-txwd"
+url = "https://www.govinfo.gov/rss/uscourts-txwd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-utd"
+url = "https://www.govinfo.gov/rss/uscourts-utd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-vid"
+url = "https://www.govinfo.gov/rss/uscourts-vid.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-vtd"
+url = "https://www.govinfo.gov/rss/uscourts-vtd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-waed"
+url = "https://www.govinfo.gov/rss/uscourts-waed.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-wiwd"
+url = "https://www.govinfo.gov/rss/uscourts-wiwd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-wvnd"
+url = "https://www.govinfo.gov/rss/uscourts-wvnd.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-wyd"
+url = "https://www.govinfo.gov/rss/uscourts-wyd.xml"
+base_poll_seconds = 360
+
+
+[[feeds]]
+id = "uscourts-govinfo-ca1"
+url = "https://www.govinfo.gov/rss/uscourts-ca1.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ca2"
+url = "https://www.govinfo.gov/rss/uscourts-ca2.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ca3"
+url = "https://www.govinfo.gov/rss/uscourts-ca3.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ca4"
+url = "https://www.govinfo.gov/rss/uscourts-ca4.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ca5"
+url = "https://www.govinfo.gov/rss/uscourts-ca5.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ca6"
+url = "https://www.govinfo.gov/rss/uscourts-ca6.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ca7"
+url = "https://www.govinfo.gov/rss/uscourts-ca7.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ca8"
+url = "https://www.govinfo.gov/rss/uscourts-ca8.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ca9"
+url = "https://www.govinfo.gov/rss/uscourts-ca9.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ca10"
+url = "https://www.govinfo.gov/rss/uscourts-ca10.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ca11"
+url = "https://www.govinfo.gov/rss/uscourts-ca11.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-cadc"
+url = "https://www.govinfo.gov/rss/uscourts-cadc.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ca13"
+url = "https://www.govinfo.gov/rss/uscourts-ca13.xml"
+base_poll_seconds = 360
+
+
+[[feeds]]
+id = "uscourts-govinfo-almb"
+url = "https://www.govinfo.gov/rss/uscourts-almb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-alnb"
+url = "https://www.govinfo.gov/rss/uscourts-alnb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-alsb"
+url = "https://www.govinfo.gov/rss/uscourts-alsb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-akb"
+url = "https://www.govinfo.gov/rss/uscourts-akb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-areb"
+url = "https://www.govinfo.gov/rss/uscourts-areb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-arwb"
+url = "https://www.govinfo.gov/rss/uscourts-arwb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-azb"
+url = "https://www.govinfo.gov/rss/uscourts-azb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-caeb"
+url = "https://www.govinfo.gov/rss/uscourts-caeb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-canb"
+url = "https://www.govinfo.gov/rss/uscourts-canb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-cacb"
+url = "https://www.govinfo.gov/rss/uscourts-cacb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-cob"
+url = "https://www.govinfo.gov/rss/uscourts-cob.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-dcb"
+url = "https://www.govinfo.gov/rss/uscourts-dcb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ctb"
+url = "https://www.govinfo.gov/rss/uscourts-ctb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-deb"
+url = "https://www.govinfo.gov/rss/uscourts-deb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-flsb"
+url = "https://www.govinfo.gov/rss/uscourts-flsb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-flmb"
+url = "https://www.govinfo.gov/rss/uscourts-flmb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ganb"
+url = "https://www.govinfo.gov/rss/uscourts-ganb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-gamb"
+url = "https://www.govinfo.gov/rss/uscourts-gamb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-hib"
+url = "https://www.govinfo.gov/rss/uscourts-hib.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ilnb"
+url = "https://www.govinfo.gov/rss/uscourts-ilnb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ilsb"
+url = "https://www.govinfo.gov/rss/uscourts-ilsb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ilcb"
+url = "https://www.govinfo.gov/rss/uscourts-ilcb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-insb"
+url = "https://www.govinfo.gov/rss/uscourts-insb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ianb"
+url = "https://www.govinfo.gov/rss/uscourts-ianb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-kyeb"
+url = "https://www.govinfo.gov/rss/uscourts-kyeb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-kywb"
+url = "https://www.govinfo.gov/rss/uscourts-kywb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-laeb"
+url = "https://www.govinfo.gov/rss/uscourts-laeb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-lawb"
+url = "https://www.govinfo.gov/rss/uscourts-lawb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-lamb"
+url = "https://www.govinfo.gov/rss/uscourts-lamb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-meb"
+url = "https://www.govinfo.gov/rss/uscourts-meb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-mdb"
+url = "https://www.govinfo.gov/rss/uscourts-mdb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-mab"
+url = "https://www.govinfo.gov/rss/uscourts-mab.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-miwb"
+url = "https://www.govinfo.gov/rss/uscourts-miwb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-mnb"
+url = "https://www.govinfo.gov/rss/uscourts-mnb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-msnb"
+url = "https://www.govinfo.gov/rss/uscourts-msnb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-moeb"
+url = "https://www.govinfo.gov/rss/uscourts-moeb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-mowb"
+url = "https://www.govinfo.gov/rss/uscourts-mowb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-mtb"
+url = "https://www.govinfo.gov/rss/uscourts-mtb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-neb"
+url = "https://www.govinfo.gov/rss/uscourts-neb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-nvb"
+url = "https://www.govinfo.gov/rss/uscourts-nvb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-nhb"
+url = "https://www.govinfo.gov/rss/uscourts-nhb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-njb"
+url = "https://www.govinfo.gov/rss/uscourts-njb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-nmb"
+url = "https://www.govinfo.gov/rss/uscourts-nmb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-nyeb"
+url = "https://www.govinfo.gov/rss/uscourts-nyeb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-nynb"
+url = "https://www.govinfo.gov/rss/uscourts-nynb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-nysb"
+url = "https://www.govinfo.gov/rss/uscourts-nysb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-nywb"
+url = "https://www.govinfo.gov/rss/uscourts-nywb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-nceb"
+url = "https://www.govinfo.gov/rss/uscourts-nceb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ncwb"
+url = "https://www.govinfo.gov/rss/uscourts-ncwb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ndb"
+url = "https://www.govinfo.gov/rss/uscourts-ndb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ohnb"
+url = "https://www.govinfo.gov/rss/uscourts-ohnb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-ohsb"
+url = "https://www.govinfo.gov/rss/uscourts-ohsb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-okeb"
+url = "https://www.govinfo.gov/rss/uscourts-okeb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-oknb"
+url = "https://www.govinfo.gov/rss/uscourts-oknb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-okwb"
+url = "https://www.govinfo.gov/rss/uscourts-okwb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-orb"
+url = "https://www.govinfo.gov/rss/uscourts-orb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-paeb"
+url = "https://www.govinfo.gov/rss/uscourts-paeb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-pamb"
+url = "https://www.govinfo.gov/rss/uscourts-pamb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-pawb"
+url = "https://www.govinfo.gov/rss/uscourts-pawb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-prb"
+url = "https://www.govinfo.gov/rss/uscourts-prb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-rib"
+url = "https://www.govinfo.gov/rss/uscourts-rib.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-scb"
+url = "https://www.govinfo.gov/rss/uscourts-scb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-sdb"
+url = "https://www.govinfo.gov/rss/uscourts-sdb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-tneb"
+url = "https://www.govinfo.gov/rss/uscourts-tneb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-tnmb"
+url = "https://www.govinfo.gov/rss/uscourts-tnmb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-txsb"
+url = "https://www.govinfo.gov/rss/uscourts-txsb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-txwb"
+url = "https://www.govinfo.gov/rss/uscourts-txwb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-vawb"
+url = "https://www.govinfo.gov/rss/uscourts-vawb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-vib"
+url = "https://www.govinfo.gov/rss/uscourts-vib.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-waeb"
+url = "https://www.govinfo.gov/rss/uscourts-waeb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-wawb"
+url = "https://www.govinfo.gov/rss/uscourts-wawb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-wvnb"
+url = "https://www.govinfo.gov/rss/uscourts-wvnb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-wieb"
+url = "https://www.govinfo.gov/rss/uscourts-wieb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-wiwb"
+url = "https://www.govinfo.gov/rss/uscourts-wiwb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-wyb"
+url = "https://www.govinfo.gov/rss/uscourts-wyb.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-jpml"
+url = "https://www.govinfo.gov/rss/uscourts-jpml.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-cit"
+url = "https://www.govinfo.gov/rss/uscourts-cit.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "uscourts-govinfo-cofc"
+url = "https://www.govinfo.gov/rss/uscourts-cofc.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "bills-govinfo-bulkdata"
+url = "https://www.govinfo.gov/rss/bills-bulkdata.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "billstatus-govinfo-bulkdata"
+url = "https://www.govinfo.gov/rss/billstatus-bulkdata.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "billstatus-govinfo-batch"
+url = "https://www.govinfo.gov/rss/billstatus-batch.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "billsum-govinfo-bulkdata"
+url = "https://www.govinfo.gov/rss/billsum-bulkdata.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "cfr-govinfo-bulkdata"
+url = "https://www.govinfo.gov/rss/cfr-bulkdata.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "ecfr-govinfo-bulkdata"
+url = "https://www.govinfo.gov/rss/ecfr-bulkdata.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "fr-govinfo-bulkdata"
+url = "https://www.govinfo.gov/rss/fr-bulkdata.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "govman-govinfo-bulkdata"
+url = "https://www.govinfo.gov/rss/govman-bulkdata.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "hman-govinfo-bulkdata"
+url = "https://www.govinfo.gov/rss/hman-bulkdata.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "pai-govinfo-bulkdata"
+url = "https://www.govinfo.gov/rss/pai-bulkdata.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "ppp-govinfo-bulkdata"
+url = "https://www.govinfo.gov/rss/ppp-bulkdata.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "statute-govinfo-bulkdata"
+url = "https://www.govinfo.gov/rss/statute-bulkdata.xml"
+base_poll_seconds = 360
+
+[[feeds]]
+id = "comps-govinfo-bulkdata"
+url = "https://www.govinfo.gov/rss/comps-bulkdata.xml"
+base_poll_seconds = 360
