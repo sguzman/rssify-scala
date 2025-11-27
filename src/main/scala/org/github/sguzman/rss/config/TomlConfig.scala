@@ -36,7 +36,7 @@ object ConfigLoader:
     for
       rawContent <- Sync[F].blocking(new String(Files.readAllBytes(path)))
       parsed <- Sync[F]
-        .fromEither(Toml.parseAs[RawConfig](rawContent).leftMap(err => new RuntimeException(err.prettyError)))
+        .fromEither(Toml.parseAs[RawConfig](rawContent).leftMap(err => new RuntimeException(err.toString)))
         .adaptError { case e => new RuntimeException(s"TOML parse error: ${e.getMessage}", e) }
       cfg <- Sync[F].delay(toAppConfig(parsed, path))
     yield cfg

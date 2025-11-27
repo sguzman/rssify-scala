@@ -4,13 +4,16 @@ import cats.effect.*
 import cats.syntax.all.*
 import doobie.*
 import doobie.implicits.*
-import doobie.implicits.javatime.*
 import doobie.hikari.HikariTransactor
 import doobie.util.transactor.Transactor
 import org.github.sguzman.rss.model.*
 import org.typelevel.log4cats.Logger
 
 import java.time.Instant
+import java.sql.Timestamp
+import doobie.util.meta.Meta
+
+given Meta[Instant] = Meta[Timestamp].imap(_.toInstant)(Timestamp.from)
 
 object Database:
   def transactor[F[_]: Async](cfg: AppConfig): Resource[F, HikariTransactor[F]] =

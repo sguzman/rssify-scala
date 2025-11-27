@@ -128,7 +128,7 @@ object LinkState:
       rand: Double
   ): LinkState =
     val modified = hasChanged(state, result.etag, result.lastModified, result.status)
-    val isError = result.error.isDefined || result.status.exists(s => s.isClientError || s.isServerError)
+    val isError = result.error.isDefined || result.status.exists(s => isErrorStatus(s))
     val (backoffIdx, phase, note) =
       if isError then (state.backoffIndex + 1, LinkPhase.ErrorBackoff, Some(s"head-error-${result.error}"))
       else if modified then (state.backoffIndex.max(0), LinkPhase.NeedsGet, Some("head-modified"))
@@ -161,7 +161,7 @@ object LinkState:
       bodyChanged: Boolean,
       rand: Double
   ): LinkState =
-    val isError = result.error.isDefined || result.status.exists(s => s.isClientError || s.isServerError)
+    val isError = result.error.isDefined || result.status.exists(s => isErrorStatus(s))
     val (backoffIdx, phase, note) =
       if isError then (state.backoffIndex + 1, LinkPhase.ErrorBackoff, Some(s"get-error-${result.error}"))
       else if bodyChanged then (0, LinkPhase.Sleeping, Some("get-body-changed"))
@@ -220,6 +220,11 @@ object LinkState:
     val jitterSeconds = math.round(centered).toLong
     val total = math.max(0L, clamped + jitterSeconds)
     Delay(totalSeconds = total, jitterSeconds = jitterSeconds)
+
+  private def isErrorStatus(s: Status): Boolean =
+    s.responseClass match
+      case Status.ResponseClass.ClientError | Status.ResponseClass.ServerError => true
+      case _                                                                   => false
 
 // ----- Helpers -----
 

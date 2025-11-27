@@ -196,10 +196,14 @@ object Scheduler:
   private def getDomainSem[F[_]: Async](domain: String, existing: Map[String, Semaphore[F]]): F[Semaphore[F]] =
     existing.get(domain).fold(Semaphore[F](1))(Async[F].pure)
 
-  private def combinedPermit[F[_]: Async](global: Option[Semaphore[F]], domain: Semaphore[F]): cats.effect.Resource[F, Unit] =
+  private def combinedPermit[F[_]: Async](
+      global: Option[Semaphore[F]],
+      domain: Semaphore[F]
+  ): cats.effect.Resource[F, Unit] =
     global match
-      case Some(g) => for
-        _ <- g.permit
-        _ <- domain.permit
-      yield ()
-      case None    => domain.permit
+      case Some(g) =>
+        for
+          _ <- g.permit
+          _ <- domain.permit
+        yield ()
+      case None => domain.permit
