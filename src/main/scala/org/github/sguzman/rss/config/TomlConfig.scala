@@ -21,6 +21,8 @@ final case class RawApp(
     mode: Option[String] = None
 )
 
+final case class RawAppFile(app: RawApp)
+
 final case class RawDomain(max_concurrent_requests: Int)
 
 final case class RawFeed(id: String, url: String, base_poll_seconds: Option[Int])
@@ -31,6 +33,7 @@ final case class RawDomainEntry(name: String, max_concurrent_requests: Int)
 
 final case class RawFeedsFile(feeds: List[RawFeed])
 
+given Codec[RawAppFile] = Codec.derived
 given Codec[RawApp] = Codec.derived
 given Codec[RawDomain] = Codec.derived
 given Codec[RawDomainEntry] = Codec.derived
@@ -46,7 +49,7 @@ object ConfigLoader {
     for {
       appContent <- Sync[F].blocking(os.read(configPath))
       rawApp <- Sync[F]
-        .fromEither(Toml.parseAs[RawApp](appContent).leftMap(err => new RuntimeException(err.toString)))
+        .fromEither(Toml.parseAs[RawAppFile](appContent).leftMap(err => new RuntimeException(err.toString)))
         .adaptError { case e => new RuntimeException(s"TOML parse error in app file: ${e.getMessage}", e) }
       domainContent <- Sync[F].blocking(os.read(domainsPath))
       rawDomains <- Sync[F]
@@ -56,7 +59,7 @@ object ConfigLoader {
       rawFeeds <- Sync[F]
         .fromEither(Toml.parseAs[RawFeedsFile](feedContent).leftMap(err => new RuntimeException(err.toString)))
         .adaptError { case e => new RuntimeException(s"TOML parse error in feeds file: ${e.getMessage}", e) }
-      cfg <- Sync[F].delay(toAppConfig(rawApp, rawDomains, rawFeeds, configPath))
+      cfg <- Sync[F].delay(toAppConfig(rawApp.app, rawDomains, rawFeeds, configPath))
     } yield cfg
   }
 
