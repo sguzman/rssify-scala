@@ -1,10 +1,10 @@
 package org.github.sguzman.rss.config
 
-import cats.effect.{IO, Sync}
+import cats.effect.Sync
 import cats.syntax.all.*
 import org.github.sguzman.rss.model.*
-import toml.Codecs.given
-import toml.{Codec, Toml}
+import toml.Toml
+import toml.derivation.auto.*
 
 import java.net.URI
 import java.nio.file.{Files, Path}

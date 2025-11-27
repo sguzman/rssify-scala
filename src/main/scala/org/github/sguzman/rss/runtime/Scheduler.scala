@@ -1,20 +1,22 @@
 package org.github.sguzman.rss.runtime
 
 import cats.effect.kernel.{Async, Clock}
+import cats.effect.implicits.*
 import cats.effect.std.{Random, Semaphore}
 import cats.syntax.all.*
+import cats.syntax.parallel.*
 import fs2.Stream
 import org.github.sguzman.rss.Logging
 import org.github.sguzman.rss.db.Database
 import org.github.sguzman.rss.http.HttpClient
 import org.github.sguzman.rss.model.*
+import org.github.sguzman.rss.model.Hashing
 import org.http4s.Status
 import org.http4s.Uri
 import org.http4s.client.Client
 import org.http4s.syntax.all.*
 import org.typelevel.log4cats.Logger
 
-import java.net.URI
 import java.time.Instant
 import scala.concurrent.duration.*
 
@@ -128,21 +130,21 @@ object Scheduler:
           res <- HttpClient.doGet(client, uri, cfg.userAgent)
           bodyChanged = res.body.exists(_.nonEmpty) // heuristic
           updated = LinkState.applyGetResult(state.copy(phase = LinkPhase.NeedsGet), res, now, bodyChanged, rand)
-        _ <- Database.insertEvent(
-          feedId = feed.id,
-          method = "GET",
-          status = res.status.map(_.code),
-          errorKind = res.error,
-          latency = Some(res.latency.toMillis),
-          backoffIndex = updated.backoffIndex,
-          scheduled = updated.nextActionAt,
-          debug = updated.note,
-          xa = xa
-        )
-        _ <- res.body.traverse_ { b =>
-          val hash = Hashing.sha256(b)
-          Database.insertBody(feed.id, now, res.etag, res.lastModified, Some(hash), b, xa)
-        }
+          _ <- Database.insertEvent(
+            feedId = feed.id,
+            method = "GET",
+            status = res.status.map(_.code),
+            errorKind = res.error,
+            latency = Some(res.latency.toMillis),
+            backoffIndex = updated.backoffIndex,
+            scheduled = updated.nextActionAt,
+            debug = updated.note,
+            xa = xa
+          )
+          _ <- res.body.traverse_ { b =>
+            val hash = Hashing.sha256(b)
+            Database.insertBody(feed.id, now, res.etag, res.lastModified, Some(hash), b, xa)
+          }
           _ <- Database.insertState(updated, now, xa)
         yield ()
       }
@@ -196,5 +198,8 @@ object Scheduler:
 
   private def combinedPermit[F[_]: Async](global: Option[Semaphore[F]], domain: Semaphore[F]): cats.effect.Resource[F, Unit] =
     global match
-      case Some(g) => for _ <- g.permit; _ <- domain.permit yield ()
+      case Some(g) => for
+        _ <- g.permit
+        _ <- domain.permit
+      yield ()
       case None    => domain.permit

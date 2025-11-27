@@ -1,11 +1,12 @@
 package org.github.sguzman.rss.http
 
 import cats.effect.kernel.Async
+import cats.effect.Resource
 import cats.syntax.all.*
-import org.github.sguzman.rss.Logging
 import org.github.sguzman.rss.model.*
 import org.http4s.client.Client
 import org.http4s.ember.client.EmberClientBuilder
+import org.http4s.headers.{ETag, `Last-Modified`}
 import org.http4s.{Header, Headers, Method, Request, Uri}
 import org.typelevel.ci.CIString
 import org.typelevel.log4cats.Logger
@@ -28,8 +29,8 @@ object HttpClient:
     val request = Request[F](Method.HEAD, uri, headers = headerUserAgent(ua))
     timed {
       client.run(request).use { resp =>
-        val etag = resp.headers.get[org.http4s.headers.ETag].map(_.tag.toString)
-        val lastModified = resp.headers.get[org.http4s.headers.LastModified].map(_.date.toInstant)
+        val etag = resp.headers.get[ETag].map(_.tag.toString)
+        val lastModified = resp.headers.get[`Last-Modified`].map(_.date.toInstant)
         val status = resp.status
         HeadResult(status = Some(status), etag = etag, lastModified = lastModified, error = None, latency = 0.millis)
           .pure[F]
@@ -46,8 +47,8 @@ object HttpClient:
       client.run(request).use { resp =>
         for
           body <- resp.body.compile.to(Array)
-          etag = resp.headers.get[org.http4s.headers.ETag].map(_.tag.toString)
-          lastModified = resp.headers.get[org.http4s.headers.LastModified].map(_.date.toInstant)
+          etag = resp.headers.get[ETag].map(_.tag.toString)
+          lastModified = resp.headers.get[`Last-Modified`].map(_.date.toInstant)
         yield GetResult(
           status = Some(resp.status),
           body = Some(body),

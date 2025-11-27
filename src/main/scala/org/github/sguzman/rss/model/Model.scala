@@ -119,7 +119,7 @@ object LinkState:
       state.phase match
         case LinkPhase.NeedsInitialGet | LinkPhase.NeedsGet => NextAction.DoGet(state)
         case LinkPhase.NeedsHead                             => NextAction.DoHead(state)
-        case LinkPhase.ErrorBackoff | LinkPhase.Sleeping     => NextAction.DoHead(state)
+        case LinkPhase.ErrorBackoff | LinkPhase.Sleeping     => NextAction.SleepUntil(state.nextActionAt)
 
   def applyHeadResult(
       state: LinkState,
@@ -128,7 +128,7 @@ object LinkState:
       rand: Double
   ): LinkState =
     val modified = hasChanged(state, result.etag, result.lastModified, result.status)
-    val isError = result.error.isDefined || result.status.exists(_.responseClass.isError)
+    val isError = result.error.isDefined || result.status.exists(s => s.isClientError || s.isServerError)
     val (backoffIdx, phase, note) =
       if isError then (state.backoffIndex + 1, LinkPhase.ErrorBackoff, Some(s"head-error-${result.error}"))
       else if modified then (state.backoffIndex.max(0), LinkPhase.NeedsGet, Some("head-modified"))
@@ -161,7 +161,7 @@ object LinkState:
       bodyChanged: Boolean,
       rand: Double
   ): LinkState =
-    val isError = result.error.isDefined || result.status.exists(_.responseClass.isError)
+    val isError = result.error.isDefined || result.status.exists(s => s.isClientError || s.isServerError)
     val (backoffIdx, phase, note) =
       if isError then (state.backoffIndex + 1, LinkPhase.ErrorBackoff, Some(s"get-error-${result.error}"))
       else if bodyChanged then (0, LinkPhase.Sleeping, Some("get-body-changed"))

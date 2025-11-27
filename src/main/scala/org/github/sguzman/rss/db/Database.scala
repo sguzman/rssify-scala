@@ -4,6 +4,7 @@ import cats.effect.*
 import cats.syntax.all.*
 import doobie.*
 import doobie.implicits.*
+import doobie.implicits.javatime.*
 import doobie.hikari.HikariTransactor
 import doobie.util.transactor.Transactor
 import org.github.sguzman.rss.model.*
