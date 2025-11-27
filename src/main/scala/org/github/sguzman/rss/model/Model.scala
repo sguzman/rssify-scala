@@ -11,7 +11,9 @@ import scala.concurrent.duration.*
 
 // ----- Configuration -----
 
-final case class DomainConfig(maxConcurrentRequests: Int)
+final case class DomainConfig(
+    maxConcurrentRequests: Int
+)
 
 final case class FeedConfig(
     id: String,
@@ -30,7 +32,9 @@ final case class AppConfig(
     errorBackoffBaseSeconds: Int,
     maxErrorBackoffSeconds: Int,
     jitterFraction: Double,
-    globalMaxConcurrentRequests: Option[Int],
+    globalMaxConcurrentRequests: Option[
+      Int
+    ],
     userAgent: String,
     mode: AppMode,
     domains: Map[String, DomainConfig],
@@ -40,7 +44,9 @@ final case class AppConfig(
 // ----- Logging & errors -----
 
 enum ErrorKind:
-  case Timeout, DnsFailure, ConnectionFailure, Http4xx, Http5xx, ParseError, Unexpected
+  case Timeout, DnsFailure,
+    ConnectionFailure, Http4xx, Http5xx,
+    ParseError, Unexpected
 
 // ----- HTTP results -----
 
@@ -96,7 +102,11 @@ enum NextAction:
   case SleepUntil(at: Instant)
 
 object LinkState:
-  def initial(feed: FeedConfig, cfg: AppConfig, now: Instant): LinkState =
+  def initial(
+      feed: FeedConfig,
+      cfg: AppConfig,
+      now: Instant
+  ): LinkState =
     LinkState(
       feedId = feed.id,
       phase = LinkPhase.NeedsInitialGet,
@@ -117,13 +127,25 @@ object LinkState:
       note = Some("initial")
     )
 
-  def decideNextAction(state: LinkState, now: Instant): NextAction =
-    if now.isBefore(state.nextActionAt) then NextAction.SleepUntil(state.nextActionAt)
+  def decideNextAction(
+      state: LinkState,
+      now: Instant
+  ): NextAction =
+    if now.isBefore(state.nextActionAt)
+    then
+      NextAction.SleepUntil(
+        state.nextActionAt
+      )
     else
       state.phase match
-        case LinkPhase.NeedsInitialGet | LinkPhase.NeedsGet => NextAction.DoGet(state)
-        case LinkPhase.NeedsHead                             => NextAction.DoHead(state)
-        case LinkPhase.ErrorBackoff | LinkPhase.Sleeping     => NextAction.SleepUntil(state.nextActionAt)
+        case LinkPhase.NeedsInitialGet | LinkPhase.NeedsGet =>
+          NextAction.DoGet(state)
+        case LinkPhase.NeedsHead =>
+          NextAction.DoHead(state)
+        case LinkPhase.ErrorBackoff | LinkPhase.Sleeping =>
+          NextAction.SleepUntil(
+            state.nextActionAt
+          )
 
   def applyHeadResult(
       state: LinkState,
@@ -131,12 +153,36 @@ object LinkState:
       now: Instant,
       rand: Double
   ): LinkState =
-    val modified = hasChanged(state, result.etag, result.lastModified, result.status)
-    val isError = result.error.isDefined || result.status.exists(s => isErrorStatus(s))
+    val modified = hasChanged(
+      state,
+      result.etag,
+      result.lastModified,
+      result.status
+    )
+    val isError =
+      result.error.isDefined || result.status
+        .exists(s => isErrorStatus(s))
     val (backoffIdx, phase, note) =
-      if isError then (state.backoffIndex + 1, LinkPhase.ErrorBackoff, Some(s"head-error-${result.error}"))
-      else if modified then (state.backoffIndex.max(0), LinkPhase.NeedsGet, Some("head-modified"))
-      else (state.backoffIndex + 1, LinkPhase.Sleeping, Some("head-not-modified"))
+      if isError then
+        (
+          state.backoffIndex + 1,
+          LinkPhase.ErrorBackoff,
+          Some(
+            s"head-error-${result.error}"
+          )
+        )
+      else if modified then
+        (
+          state.backoffIndex.max(0),
+          LinkPhase.NeedsGet,
+          Some("head-modified")
+        )
+      else
+        (
+          state.backoffIndex + 1,
+          LinkPhase.Sleeping,
+          Some("head-not-modified")
+        )
 
     val delay = computeDelaySeconds(
       base = state.basePollSeconds,
@@ -152,8 +198,11 @@ object LinkState:
       lastHeadError = result.error,
       backoffIndex = backoffIdx,
       etag = result.etag.orElse(state.etag),
-      lastModified = result.lastModified.orElse(state.lastModified),
-      nextActionAt = now.plusSeconds(delay.totalSeconds),
+      lastModified = result.lastModified
+        .orElse(state.lastModified),
+      nextActionAt = now.plusSeconds(
+        delay.totalSeconds
+      ),
       jitterSeconds = delay.jitterSeconds,
       note = note
     )
@@ -165,11 +214,30 @@ object LinkState:
       bodyChanged: Boolean,
       rand: Double
   ): LinkState =
-    val isError = result.error.isDefined || result.status.exists(s => isErrorStatus(s))
+    val isError =
+      result.error.isDefined || result.status
+        .exists(s => isErrorStatus(s))
     val (backoffIdx, phase, note) =
-      if isError then (state.backoffIndex + 1, LinkPhase.ErrorBackoff, Some(s"get-error-${result.error}"))
-      else if bodyChanged then (0, LinkPhase.Sleeping, Some("get-body-changed"))
-      else (state.backoffIndex + 1, LinkPhase.Sleeping, Some("get-unchanged"))
+      if isError then
+        (
+          state.backoffIndex + 1,
+          LinkPhase.ErrorBackoff,
+          Some(
+            s"get-error-${result.error}"
+          )
+        )
+      else if bodyChanged then
+        (
+          0,
+          LinkPhase.Sleeping,
+          Some("get-body-changed")
+        )
+      else
+        (
+          state.backoffIndex + 1,
+          LinkPhase.Sleeping,
+          Some("get-unchanged")
+        )
 
     val delay = computeDelaySeconds(
       base = state.basePollSeconds,
@@ -179,14 +247,20 @@ object LinkState:
       rand = rand
     )
     state.copy(
-      phase = if phase == LinkPhase.Sleeping then LinkPhase.NeedsHead else phase,
+      phase =
+        if phase == LinkPhase.Sleeping
+        then LinkPhase.NeedsHead
+        else phase,
       lastGetAt = Some(now),
       lastGetStatus = result.status,
       lastGetError = result.error,
       etag = result.etag.orElse(state.etag),
-      lastModified = result.lastModified.orElse(state.lastModified),
+      lastModified = result.lastModified
+        .orElse(state.lastModified),
       backoffIndex = backoffIdx,
-      nextActionAt = now.plusSeconds(delay.totalSeconds),
+      nextActionAt = now.plusSeconds(
+        delay.totalSeconds
+      ),
       jitterSeconds = delay.jitterSeconds,
       note = note
     )
@@ -197,7 +271,10 @@ object LinkState:
       lastModified: Option[Instant],
       status: Option[Status]
   ): Boolean =
-    val byStatus = status.exists(s => s == Status.Ok && state.lastHeadStatus.contains(Status.NotModified))
+    val byStatus = status.exists(s =>
+      s == Status.Ok && state.lastHeadStatus
+        .contains(Status.NotModified)
+    )
     val byEtag = for
       a <- state.etag
       b <- etag
@@ -206,9 +283,14 @@ object LinkState:
       a <- state.lastModified
       b <- lastModified
     yield a != b
-    byStatus || byEtag.contains(true) || byMod.contains(true)
+    byStatus || byEtag.contains(
+      true
+    ) || byMod.contains(true)
 
-  final case class Delay(totalSeconds: Long, jitterSeconds: Long)
+  final case class Delay(
+      totalSeconds: Long,
+      jitterSeconds: Long
+  )
 
   def computeDelaySeconds(
       base: Int,
@@ -217,21 +299,43 @@ object LinkState:
       jitterFraction: Double,
       rand: Double
   ): Delay =
-    val baseSeconds = base.toLong * math.pow(2.0, backoff.toDouble).toLong
-    val clamped = math.min(baseSeconds, maxSeconds.toLong)
-    val jitterRaw = clamped.toDouble * jitterFraction
-    val centered = (rand * 2.0 - 1.0) * jitterRaw
-    val jitterSeconds = math.round(centered).toLong
-    val total = math.max(0L, clamped + jitterSeconds)
-    Delay(totalSeconds = total, jitterSeconds = jitterSeconds)
+    val baseSeconds = base.toLong * math
+      .pow(2.0, backoff.toDouble)
+      .toLong
+    val clamped = math.min(
+      baseSeconds,
+      maxSeconds.toLong
+    )
+    val jitterRaw =
+      clamped.toDouble * jitterFraction
+    val centered =
+      (rand * 2.0 - 1.0) * jitterRaw
+    val jitterSeconds =
+      math.round(centered).toLong
+    val total = math.max(
+      0L,
+      clamped + jitterSeconds
+    )
+    Delay(
+      totalSeconds = total,
+      jitterSeconds = jitterSeconds
+    )
 
-  private def isErrorStatus(s: Status): Boolean =
+  private def isErrorStatus(
+      s: Status
+  ): Boolean =
     val code = s.code
     code >= 400 && code <= 599
 
 // ----- Helpers -----
 
 object Hashing:
-  def sha256(bytes: Array[Byte]): String =
-    val md = MessageDigest.getInstance("SHA-256")
-    md.digest(bytes).map("%02x".format(_)).mkString
+  def sha256(
+      bytes: Array[Byte]
+  ): String =
+    val md = MessageDigest.getInstance(
+      "SHA-256"
+    )
+    md.digest(bytes)
+      .map("%02x".format(_))
+      .mkString

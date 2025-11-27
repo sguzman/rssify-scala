@@ -10,41 +10,69 @@ import org.github.sguzman.rss.runtime.Scheduler
 import org.typelevel.log4cats.Logger
 
 object Main extends IOApp {
-  def run(args: List[String]): IO[ExitCode] = {
-    val defaultConfigPath = os.pwd / "src" / "main" / "resources" / "config.toml"
+  def run(
+      args: List[String]
+  ): IO[ExitCode] = {
+    val defaultConfigPath =
+      os.pwd / "src" / "main" / "resources" / "config.toml"
     val cfgPath = args.headOption
       .map(p => os.Path(p, base = os.pwd))
       .getOrElse(defaultConfigPath)
     val program = for
-      cfg <- ConfigLoader.load[IO](cfgPath)
+      cfg <- ConfigLoader.load[IO](
+        cfgPath
+      )
       _ <- resetDbIfDev(cfg)
       _ <- Logger[IO].info(
         s"Loaded config for ${cfg.feeds.size} feeds, db=${cfg.dbPath}, mode=${cfg.mode}"
       )
-      _ <- Database.transactor[IO](cfg).use { xa =>
-        for
-          _ <- Database.migrate(xa)
-          _ <- Database.upsertFeeds(cfg.feeds, xa)
-          _ <- Logger[IO].info(s"Domain limits: ${cfg.domains}")
-          _ <- HttpClient.resource[IO](cfg).use { client =>
-            Scheduler.loop[IO](cfg, client, xa).compile.drain
-          }
-        yield ()
-      }
+      _ <- Database
+        .transactor[IO](cfg)
+        .use { xa =>
+          for
+            _ <- Database.migrate(xa)
+            _ <- Database.upsertFeeds(
+              cfg.feeds,
+              xa
+            )
+            _ <- Logger[IO].info(
+              s"Domain limits: ${cfg.domains}"
+            )
+            _ <- HttpClient
+              .resource[IO](cfg)
+              .use { client =>
+                Scheduler
+                  .loop[IO](
+                    cfg,
+                    client,
+                    xa
+                  )
+                  .compile
+                  .drain
+              }
+          yield ()
+        }
     yield ExitCode.Success
 
     program.handleErrorWith { err =>
-      Logger[IO].error(err)(s"Fatal error: ${err.getMessage}") *> IO.pure(
+      Logger[IO].error(err)(
+        s"Fatal error: ${err.getMessage}"
+      ) *> IO.pure(
         ExitCode.Error
       )
     }
   }
 
-  private def resetDbIfDev(cfg: org.github.sguzman.rss.model.AppConfig): IO[Unit] =
+  private def resetDbIfDev(
+      cfg: org.github.sguzman.rss.model.AppConfig
+  ): IO[Unit] =
     cfg.mode match
       case AppMode.Dev =>
-        val dbOsPath = os.Path(cfg.dbPath.toString)
-        Logger[IO].warn(s"Dev mode enabled, deleting database at ${cfg.dbPath}") *>
+        val dbOsPath =
+          os.Path(cfg.dbPath.toString)
+        Logger[IO].warn(
+          s"Dev mode enabled, deleting database at ${cfg.dbPath}"
+        ) *>
           IO.blocking {
             if os.exists(dbOsPath) then os.remove(dbOsPath)
           }.void

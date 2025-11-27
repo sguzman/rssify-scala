@@ -13,22 +13,31 @@ import java.time.Instant
 import java.sql.Timestamp
 import doobie.util.meta.Meta
 
-given Meta[Instant] = Meta[Timestamp].imap(_.toInstant)(Timestamp.from)
+given Meta[Instant] =
+  Meta[Timestamp].imap(_.toInstant)(
+    Timestamp.from
+  )
 
 object Database:
-  def transactor[F[_]: Async](cfg: AppConfig): Resource[F, HikariTransactor[F]] =
+  def transactor[F[_]: Async](
+      cfg: AppConfig
+  ): Resource[F, HikariTransactor[F]] =
     for
-      ce <- ExecutionContexts.fixedThreadPool[F](4)
-      xa <- HikariTransactor.newHikariTransactor[F](
-        driverClassName = "org.sqlite.JDBC",
-        url = s"jdbc:sqlite:${cfg.dbPath.toString}",
-        user = "",
-        pass = "",
-        connectEC = ce
-      )
+      ce <- ExecutionContexts
+        .fixedThreadPool[F](4)
+      xa <- HikariTransactor
+        .newHikariTransactor[F](
+          driverClassName = "org.sqlite.JDBC",
+          url = s"jdbc:sqlite:${cfg.dbPath.toString}",
+          user = "",
+          pass = "",
+          connectEC = ce
+        )
     yield xa
 
-  def migrate[F[_]: Async](xa: Transactor[F]): F[Unit] =
+  def migrate[F[_]: Async](
+      xa: Transactor[F]
+  ): F[Unit] =
     val ddl = List(
       sql"""
         CREATE TABLE IF NOT EXISTS feeds(
@@ -87,11 +96,15 @@ object Database:
     )
     ddl.sequence_.transact(xa).void
 
-  def upsertFeeds[F[_]: Async: Logger](feeds: List[FeedConfig], xa: Transactor[F]): F[Unit] =
+  def upsertFeeds[F[_]: Async: Logger](
+      feeds: List[FeedConfig],
+      xa: Transactor[F]
+  ): F[Unit] =
     feeds.traverse_ { feed =>
       sql"""
         INSERT OR IGNORE INTO feeds(id, url, domain, created_at)
-        VALUES (${feed.id}, ${feed.url.toString}, ${feed.domain}, ${Instant.now()})
+        VALUES (${feed.id}, ${feed.url.toString}, ${feed.domain}, ${Instant
+          .now()})
       """.update.run.transact(xa).void
     }
 
@@ -125,8 +138,17 @@ object Database:
         base_poll_seconds, next_action_at, jitter_seconds, note
       ) VALUES (
         ${state.feedId}, $recordedAt, ${state.phase.toString}, ${state.lastHeadAt},
-        ${state.lastHeadStatus.map(_.code)}, ${state.lastHeadError.map(_.toString)},
-        ${state.lastGetAt}, ${state.lastGetStatus.map(_.code)}, ${state.lastGetError.map(_.toString)},
+        ${state.lastHeadStatus.map(
+        _.code
+      )}, ${state.lastHeadError.map(
+        _.toString
+      )},
+        ${state.lastGetAt}, ${state.lastGetStatus
+        .map(
+          _.code
+        )}, ${state.lastGetError.map(
+        _.toString
+      )},
         ${state.etag}, ${state.lastModified}, ${state.backoffIndex}, ${state.basePollSeconds},
         ${state.nextActionAt}, ${state.jitterSeconds}, ${state.note}
       )
@@ -147,7 +169,11 @@ object Database:
       INSERT INTO fetch_events(
         feed_id, event_time, method, status, error_kind, latency_ms, backoff_index, scheduled_next_action_at, debug
       ) VALUES (
-        $feedId, ${Instant.now()}, $method, $status, ${errorKind.map(_.toString)}, $latency, $backoffIndex, $scheduled, $debug
+        $feedId, ${Instant
+        .now()}, $method, $status, ${errorKind
+        .map(
+          _.toString
+        )}, $latency, $backoffIndex, $scheduled, $debug
       )
     """.update.run.transact(xa).void
 
@@ -165,7 +191,10 @@ object Database:
       VALUES ($feedId, $fetchedAt, $etag, $lastModified, $contentHash, $body)
     """.update.run.transact(xa).void
 
-  def latestState[F[_]: Async](feedId: String, xa: Transactor[F]): F[Option[StateRow]] =
+  def latestState[F[_]: Async](
+      feedId: String,
+      xa: Transactor[F]
+  ): F[Option[StateRow]] =
     sql"""
       SELECT feed_id, phase, last_head_at, last_head_status, last_head_error, last_get_at,
              last_get_status, last_get_error, etag, last_modified, backoff_index, base_poll_seconds,
@@ -174,7 +203,10 @@ object Database:
       WHERE feed_id = $feedId
       ORDER BY id DESC
       LIMIT 1
-    """.query[StateRow].option.transact(xa)
+    """
+      .query[StateRow]
+      .option
+      .transact(xa)
 
   def dueFeeds[F[_]: Async](
       now: Instant,
@@ -183,8 +215,14 @@ object Database:
   ): F[List[FeedConfig]] =
     feeds.filterA { feed =>
       latestState(feed.id, xa).map {
-        case None                        => true
-        case Some(row) if row.nextActionAt.isBefore(now) || row.nextActionAt.equals(now) => true
-        case _                           => false
+        case None => true
+        case Some(row)
+            if row.nextActionAt
+              .isBefore(
+                now
+              ) || row.nextActionAt
+              .equals(now) =>
+          true
+        case _ => false
       }
     }

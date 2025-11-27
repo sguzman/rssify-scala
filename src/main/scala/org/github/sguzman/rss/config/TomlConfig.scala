@@ -25,7 +25,11 @@ final case class RawAppFile(app: RawApp)
 
 final case class RawDomain(max_concurrent_requests: Int)
 
-final case class RawFeed(id: String, url: String, base_poll_seconds: Option[Int])
+final case class RawFeed(
+    id: String,
+    url: String,
+    base_poll_seconds: Option[Int]
+)
 
 final case class RawDomainsFile(domains: List[RawDomainEntry])
 
@@ -49,29 +53,66 @@ object ConfigLoader {
     for {
       appContent <- Sync[F].blocking(os.read(configPath))
       rawApp <- Sync[F]
-        .fromEither(Toml.parseAs[RawAppFile](appContent).leftMap(err => new RuntimeException(err.toString)))
-        .adaptError { case e => new RuntimeException(s"TOML parse error in app file: ${e.getMessage}", e) }
+        .fromEither(
+          Toml
+            .parseAs[RawAppFile](appContent)
+            .leftMap(err => new RuntimeException(err.toString))
+        )
+        .adaptError { case e =>
+          new RuntimeException(
+            s"TOML parse error in app file: ${e.getMessage}",
+            e
+          )
+        }
       domainContent <- Sync[F].blocking(os.read(domainsPath))
       rawDomains <- Sync[F]
-        .fromEither(Toml.parseAs[RawDomainsFile](domainContent).leftMap(err => new RuntimeException(err.toString)))
-        .adaptError { case e => new RuntimeException(s"TOML parse error in domains file: ${e.getMessage}", e) }
+        .fromEither(
+          Toml
+            .parseAs[RawDomainsFile](domainContent)
+            .leftMap(err => new RuntimeException(err.toString))
+        )
+        .adaptError { case e =>
+          new RuntimeException(
+            s"TOML parse error in domains file: ${e.getMessage}",
+            e
+          )
+        }
       feedContent <- Sync[F].blocking(os.read(feedsPath))
       rawFeeds <- Sync[F]
-        .fromEither(Toml.parseAs[RawFeedsFile](feedContent).leftMap(err => new RuntimeException(err.toString)))
-        .adaptError { case e => new RuntimeException(s"TOML parse error in feeds file: ${e.getMessage}", e) }
-      cfg <- Sync[F].delay(toAppConfig(rawApp.app, rawDomains, rawFeeds, configPath))
+        .fromEither(
+          Toml
+            .parseAs[RawFeedsFile](feedContent)
+            .leftMap(err => new RuntimeException(err.toString))
+        )
+        .adaptError { case e =>
+          new RuntimeException(
+            s"TOML parse error in feeds file: ${e.getMessage}",
+            e
+          )
+        }
+      cfg <- Sync[F].delay(
+        toAppConfig(rawApp.app, rawDomains, rawFeeds, configPath)
+      )
     } yield cfg
   }
 
-  private def toAppConfig(rawApp: RawApp, rawDomains: RawDomainsFile, rawFeeds: RawFeedsFile, path: os.Path): AppConfig = {
+  private def toAppConfig(
+      rawApp: RawApp,
+      rawDomains: RawDomainsFile,
+      rawFeeds: RawFeedsFile,
+      path: os.Path
+  ): AppConfig = {
     val feeds = rawFeeds.feeds.map { f =>
       val uri = URI(f.url)
-      val domain = Option(uri.getHost).getOrElse(throw new IllegalArgumentException(s"Feed ${f.id} missing host"))
+      val domain = Option(uri.getHost).getOrElse(
+        throw new IllegalArgumentException(s"Feed ${f.id} missing host")
+      )
       FeedConfig(
         id = f.id,
         url = uri,
         domain = domain,
-        basePollSeconds = f.base_poll_seconds.getOrElse(rawApp.default_poll_seconds)
+        basePollSeconds =
+          f.base_poll_seconds.getOrElse(rawApp.default_poll_seconds)
       )
     }
     val mode = parseMode(rawApp.mode)
@@ -83,7 +124,9 @@ object ConfigLoader {
         case _: IllegalArgumentException => path / os.up
       }
     val dbOsPath = os.Path(rawApp.db_path, base = dbBaseDir)
-    val domains = rawDomains.domains.map(d => d.name -> DomainConfig(d.max_concurrent_requests)).toMap
+    val domains = rawDomains.domains
+      .map(d => d.name -> DomainConfig(d.max_concurrent_requests))
+      .toMap
     AppConfig(
       dbPath = dbOsPath.toNIO,
       defaultPollSeconds = rawApp.default_poll_seconds,
@@ -103,8 +146,10 @@ object ConfigLoader {
     rawMode.map(_.toLowerCase) match {
       case None | Some("prod") => AppMode.Prod
       case Some("dev")         => AppMode.Dev
-      case Some(other) =>
-        throw IllegalArgumentException(s"Invalid app.mode '$other' in config. Expected 'dev' or 'prod'.")
+      case Some(other)         =>
+        throw IllegalArgumentException(
+          s"Invalid app.mode '$other' in config. Expected 'dev' or 'prod'."
+        )
     }
 
 }
