@@ -1,6 +1,7 @@
 package org.github.sguzman.rss.http
 
 import cats.effect.kernel.Async
+import cats.syntax.all.*
 import org.github.sguzman.rss.model.*
 import org.http4s.client.Client
 import org.http4s.ember.client.EmberClientBuilder
@@ -16,7 +17,7 @@ object HttpClient:
     Client[F]
   ] =
     EmberClientBuilder
-      .forAsync[F]
+      .default[F]
       .withIdleTimeInPool(2.minutes)
       .withTimeout(30.seconds)
       .build
@@ -50,18 +51,16 @@ object HttpClient:
           .get[`Last-Modified`]
           .map(_.date.toInstant)
         val status = resp.status
-        Async[F].pure(
-          HeadResult(
-            status = Some(status),
-            etag = etag,
-            lastModified = lastModified,
-            error = None,
-            latency = 0.millis
-          )
-        )
+        HeadResult(
+          status = Some(status),
+          etag = etag,
+          lastModified = lastModified,
+          error = None,
+          latency = 0.millis
+        ).pure[F]
       }
     }.handleErrorWith(t =>
-      Async[F].pure(headError(t))
+      headError(t).pure[F]
     )
 
   def doGet[F[_]: Async](
@@ -86,18 +85,17 @@ object HttpClient:
           lastModified = resp.headers
             .get[`Last-Modified`]
             .map(_.date.toInstant)
-        yield
-          GetResult(
-            status = Some(resp.status),
-            body = Some(body),
-            etag = etag,
-            lastModified = lastModified,
-            error = None,
-            latency = 0.millis
-          )
+        yield GetResult(
+          status = Some(resp.status),
+          body = Some(body),
+          etag = etag,
+          lastModified = lastModified,
+          error = None,
+          latency = 0.millis
+        )
       }
     }.handleErrorWith(t =>
-      Async[F].pure(getError(t))
+      getError(t).pure[F]
     )
 
   private def timed[F[_]: Async, A](
