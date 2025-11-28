@@ -8,7 +8,7 @@ import scala.xml.{Elem, NodeSeq, XML}
 
 object FeedParser:
   // Relax XML entity size limits so large feeds can be parsed.
-  private val configureXmlLimits: Unit =
+  private def configureXmlLimits(): Unit =
     List(
       "jdk.xml.maxGeneralEntitySizeLimit",
       "jdk.xml.totalEntitySizeLimit"
@@ -44,7 +44,7 @@ object FeedParser:
   def parse(
       bytes: Array[Byte]
   ): Either[Throwable, ParsedFeed] =
-    configureXmlLimits
+    configureXmlLimits()
     Try {
       val xmlString =
         String(bytes, StandardCharsets.UTF_8)
