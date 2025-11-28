@@ -49,7 +49,7 @@ object Main extends IOApp {
               s"Domain limits: ${cfg.domains}"
             )
             _ <- HttpClient
-              .resource[IO](cfg)
+              .resource[IO]
               .use { client =>
                 Scheduler
                   .loop[IO](
