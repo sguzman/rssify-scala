@@ -158,7 +158,7 @@ object ConfigLoader {
           s"No feed files found in $feedsDir"
         )
       )
-      parsed <- files.traverse { path =>
+      parsed <- files.toList.traverse { path =>
         Sync[F]
           .fromEither(
             Toml
