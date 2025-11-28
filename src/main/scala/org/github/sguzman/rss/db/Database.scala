@@ -54,7 +54,7 @@ object Database:
   def migrate[F[_]: Async](
       xa: Transactor[F]
   ): F[Unit] =
-    val ddl = List(
+    val ddl: List[ConnectionIO[Unit]] = List(
       sql"PRAGMA journal_mode=WAL".query[String].unique.void,
       sql"""
         CREATE TABLE IF NOT EXISTS feeds(
