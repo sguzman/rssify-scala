@@ -10,8 +10,10 @@ import org.http4s.{Header, Headers, Method, Request, Uri}
 import org.typelevel.ci.CIString
 
 import scala.concurrent.duration.*
+import scala.annotation.nowarn
 
 object HttpClient:
+  @nowarn("cat=deprecation")
   def resource[F[_]: Async]: cats.effect.Resource[
     F,
     Client[F]

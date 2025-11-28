@@ -194,6 +194,9 @@ object Scheduler:
           feed.url.toString
         )
         for
+          _ <- Logger[F].debug(
+            s"HEAD request for ${feed.id} at ${feed.url}"
+          )
           res <- HttpClient.doHead(
             client,
             uri,
