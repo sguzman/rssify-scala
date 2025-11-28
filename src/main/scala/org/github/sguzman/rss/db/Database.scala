@@ -6,22 +6,36 @@ import doobie.*
 import doobie.implicits.*
 import doobie.hikari.HikariTransactor
 import doobie.util.transactor.Transactor
+import doobie.util.meta.Meta
 import org.github.sguzman.rss.model.*
+import org.github.sguzman.rss.time.Time
 import org.typelevel.log4cats.Logger
 
-import java.time.Instant
-import doobie.util.meta.Meta
+import java.sql.Timestamp
+import java.time.{Instant, ZoneId}
 import org.github.sguzman.rss.time.Time
 import java.time.ZoneId
 
 given Meta[Instant] =
-  Meta[String]
-    .imap(Time.parseDbString)(instant =>
-      Time.instantToDbString(
-        instant,
-        ZoneId.systemDefault()
-      )
-    )
+  Meta[Timestamp].imap(_.toInstant)(
+    Timestamp.from
+  )
+
+private val defaultZone =
+  ZoneId.systemDefault()
+
+private def asText(
+    instant: Instant
+): String =
+  Time.instantToDbString(
+    instant,
+    defaultZone
+  )
+
+private def asTextOpt(
+    instant: Option[Instant]
+): Option[String] =
+  instant.map(asText)
 
 object Database:
   def transactor[F[_]: Async](
@@ -49,26 +63,32 @@ object Database:
           id TEXT PRIMARY KEY,
           url TEXT NOT NULL,
           domain TEXT NOT NULL,
-          created_at TEXT NOT NULL
+          created_at TIMESTAMP NOT NULL,
+          created_at_text TEXT NOT NULL
         )
       """.update.run,
       sql"""
         CREATE TABLE IF NOT EXISTS feed_state_history(
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           feed_id TEXT NOT NULL REFERENCES feeds(id),
-          recorded_at TEXT NOT NULL,
+          recorded_at TIMESTAMP NOT NULL,
+          recorded_at_text TEXT NOT NULL,
           phase TEXT NOT NULL,
-          last_head_at TEXT NULL,
+          last_head_at TIMESTAMP NULL,
+          last_head_at_text TEXT NULL,
           last_head_status INTEGER NULL,
           last_head_error TEXT NULL,
-          last_get_at TEXT NULL,
+          last_get_at TIMESTAMP NULL,
+          last_get_at_text TEXT NULL,
           last_get_status INTEGER NULL,
           last_get_error TEXT NULL,
           etag TEXT NULL,
-          last_modified TEXT NULL,
+          last_modified TIMESTAMP NULL,
+          last_modified_text TEXT NULL,
           backoff_index INTEGER NOT NULL,
           base_poll_seconds INTEGER NOT NULL,
-          next_action_at TEXT NOT NULL,
+          next_action_at TIMESTAMP NOT NULL,
+          next_action_at_text TEXT NOT NULL,
           jitter_seconds INTEGER NOT NULL,
           note TEXT NULL
         )
@@ -77,13 +97,15 @@ object Database:
         CREATE TABLE IF NOT EXISTS fetch_events(
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           feed_id TEXT NOT NULL REFERENCES feeds(id),
-          event_time TEXT NOT NULL,
+          event_time TIMESTAMP NOT NULL,
+          event_time_text TEXT NOT NULL,
           method TEXT NOT NULL,
           status INTEGER NULL,
           error_kind TEXT NULL,
           latency_ms INTEGER NULL,
           backoff_index INTEGER NOT NULL,
-          scheduled_next_action_at TEXT NOT NULL,
+          scheduled_next_action_at TIMESTAMP NOT NULL,
+          scheduled_next_action_at_text TEXT NOT NULL,
           debug TEXT NULL
         )
       """.update.run,
@@ -91,9 +113,11 @@ object Database:
         CREATE TABLE IF NOT EXISTS feed_bodies(
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           feed_id TEXT NOT NULL REFERENCES feeds(id),
-          fetched_at TEXT NOT NULL,
+          fetched_at TIMESTAMP NOT NULL,
+          fetched_at_text TEXT NOT NULL,
           etag TEXT NULL,
-          last_modified TEXT NULL,
+          last_modified TIMESTAMP NULL,
+          last_modified_text TEXT NULL,
           content_hash TEXT NULL,
           body BLOB NOT NULL
         )
@@ -106,10 +130,18 @@ object Database:
       xa: Transactor[F]
   ): F[Unit] =
     feeds.traverse_ { feed =>
+      val now = Instant.now()
       sql"""
-        INSERT OR IGNORE INTO feeds(id, url, domain, created_at)
-        VALUES (${feed.id}, ${feed.url.toString}, ${feed.domain}, ${Instant
-          .now()})
+        INSERT OR IGNORE INTO feeds(
+          id, url, domain, created_at, created_at_text
+        )
+        VALUES (
+          ${feed.id},
+          ${feed.url.toString},
+          ${feed.domain},
+          $now,
+          ${asText(now)}
+        )
       """.update.run.transact(xa).void
     }
 
@@ -138,24 +170,41 @@ object Database:
   ): F[Unit] =
     sql"""
       INSERT INTO feed_state_history(
-        feed_id, recorded_at, phase, last_head_at, last_head_status, last_head_error,
-        last_get_at, last_get_status, last_get_error, etag, last_modified, backoff_index,
-        base_poll_seconds, next_action_at, jitter_seconds, note
+        feed_id, recorded_at, recorded_at_text, phase,
+        last_head_at, last_head_at_text, last_head_status, last_head_error,
+        last_get_at, last_get_at_text, last_get_status, last_get_error,
+        etag, last_modified, last_modified_text,
+        backoff_index, base_poll_seconds, next_action_at, next_action_at_text,
+        jitter_seconds, note
       ) VALUES (
-        ${state.feedId}, $recordedAt, ${state.phase.toString}, ${state.lastHeadAt},
+        ${state.feedId},
+        $recordedAt,
+        ${asText(recordedAt)},
+        ${state.phase.toString},
+        ${state.lastHeadAt},
+        ${asTextOpt(state.lastHeadAt)},
         ${state.lastHeadStatus.map(
         _.code
       )}, ${state.lastHeadError.map(
         _.toString
       )},
-        ${state.lastGetAt}, ${state.lastGetStatus
+        ${state.lastGetAt},
+        ${asTextOpt(state.lastGetAt)},
+        ${state.lastGetStatus
         .map(
           _.code
         )}, ${state.lastGetError.map(
         _.toString
       )},
-        ${state.etag}, ${state.lastModified}, ${state.backoffIndex}, ${state.basePollSeconds},
-        ${state.nextActionAt}, ${state.jitterSeconds}, ${state.note}
+        ${state.etag},
+        ${state.lastModified},
+        ${asTextOpt(state.lastModified)},
+        ${state.backoffIndex},
+        ${state.basePollSeconds},
+        ${state.nextActionAt},
+        ${asText(state.nextActionAt)},
+        ${state.jitterSeconds},
+        ${state.note}
       )
     """.update.run.transact(xa).void
 
@@ -170,15 +219,27 @@ object Database:
       debug: Option[String],
       xa: Transactor[F]
   ): F[Unit] =
+    val now = Instant.now()
     sql"""
       INSERT INTO fetch_events(
-        feed_id, event_time, method, status, error_kind, latency_ms, backoff_index, scheduled_next_action_at, debug
+        feed_id, event_time, event_time_text, method,
+        status, error_kind, latency_ms, backoff_index,
+        scheduled_next_action_at, scheduled_next_action_at_text, debug
       ) VALUES (
-        $feedId, ${Instant
-        .now()}, $method, $status, ${errorKind
+        $feedId,
+        $now,
+        ${asText(now)},
+        $method,
+        $status,
+        ${errorKind
         .map(
           _.toString
-        )}, $latency, $backoffIndex, $scheduled, $debug
+        )},
+        $latency,
+        $backoffIndex,
+        $scheduled,
+        ${asText(scheduled)},
+        $debug
       )
     """.update.run.transact(xa).void
 
@@ -192,8 +253,20 @@ object Database:
       xa: Transactor[F]
   ): F[Unit] =
     sql"""
-      INSERT INTO feed_bodies(feed_id, fetched_at, etag, last_modified, content_hash, body)
-      VALUES ($feedId, $fetchedAt, $etag, $lastModified, $contentHash, $body)
+      INSERT INTO feed_bodies(
+        feed_id, fetched_at, fetched_at_text, etag,
+        last_modified, last_modified_text, content_hash, body
+      )
+      VALUES (
+        $feedId,
+        $fetchedAt,
+        ${asText(fetchedAt)},
+        $etag,
+        $lastModified,
+        ${asTextOpt(lastModified)},
+        $contentHash,
+        $body
+      )
     """.update.run.transact(xa).void
 
   def latestState[F[_]: Async](
