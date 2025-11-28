@@ -218,11 +218,13 @@ object Scheduler:
             backoffIndex = updated.backoffIndex,
             scheduled = updated.nextActionAt,
             debug = updated.note,
+            zone = cfg.timezone,
             xa = xa
           )
           _ <- Database.insertState(
             updated,
             now,
+            cfg.timezone,
             xa
           )
         yield ()
@@ -284,6 +286,7 @@ object Scheduler:
             backoffIndex = updated.backoffIndex,
             scheduled = updated.nextActionAt,
             debug = updated.note,
+            zone = cfg.timezone,
             xa = xa
           )
           _ <- res.body.traverse_ { b =>
@@ -295,12 +298,14 @@ object Scheduler:
               res.lastModified,
               Some(hash),
               b,
+              cfg.timezone,
               xa
             )
           }
           _ <- Database.insertState(
             updated,
             now,
+            cfg.timezone,
             xa
           )
         yield ()

@@ -13,29 +13,26 @@ import org.typelevel.log4cats.Logger
 
 import java.sql.Timestamp
 import java.time.{Instant, ZoneId}
-import org.github.sguzman.rss.time.Time
-import java.time.ZoneId
 
 given Meta[Instant] =
   Meta[Timestamp].imap(_.toInstant)(
     Timestamp.from
   )
 
-private val defaultZone =
-  ZoneId.systemDefault()
-
 private def asText(
-    instant: Instant
+    instant: Instant,
+    zone: ZoneId
 ): String =
   Time.instantToDbString(
     instant,
-    defaultZone
+    zone
   )
 
 private def asTextOpt(
-    instant: Option[Instant]
+    instant: Option[Instant],
+    zone: ZoneId
 ): Option[String] =
-  instant.map(asText)
+  instant.map(asText(_, zone))
 
 object Database:
   def transactor[F[_]: Async](
@@ -127,6 +124,7 @@ object Database:
 
   def upsertFeeds[F[_]: Async: Logger](
       feeds: List[FeedConfig],
+      zone: ZoneId,
       xa: Transactor[F]
   ): F[Unit] =
     feeds.traverse_ { feed =>
@@ -140,7 +138,7 @@ object Database:
           ${feed.url.toString},
           ${feed.domain},
           $now,
-          ${asText(now)}
+          ${asText(now, zone)}
         )
       """.update.run.transact(xa).void
     }
@@ -166,6 +164,7 @@ object Database:
   def insertState[F[_]: Async](
       state: LinkState,
       recordedAt: Instant,
+      zone: ZoneId,
       xa: Transactor[F]
   ): F[Unit] =
     sql"""
@@ -179,17 +178,17 @@ object Database:
       ) VALUES (
         ${state.feedId},
         $recordedAt,
-        ${asText(recordedAt)},
+        ${asText(recordedAt, zone)},
         ${state.phase.toString},
         ${state.lastHeadAt},
-        ${asTextOpt(state.lastHeadAt)},
+        ${asTextOpt(state.lastHeadAt, zone)},
         ${state.lastHeadStatus.map(
         _.code
       )}, ${state.lastHeadError.map(
         _.toString
       )},
         ${state.lastGetAt},
-        ${asTextOpt(state.lastGetAt)},
+        ${asTextOpt(state.lastGetAt, zone)},
         ${state.lastGetStatus
         .map(
           _.code
@@ -198,11 +197,11 @@ object Database:
       )},
         ${state.etag},
         ${state.lastModified},
-        ${asTextOpt(state.lastModified)},
+        ${asTextOpt(state.lastModified, zone)},
         ${state.backoffIndex},
         ${state.basePollSeconds},
         ${state.nextActionAt},
-        ${asText(state.nextActionAt)},
+        ${asText(state.nextActionAt, zone)},
         ${state.jitterSeconds},
         ${state.note}
       )
@@ -217,6 +216,7 @@ object Database:
       backoffIndex: Int,
       scheduled: Instant,
       debug: Option[String],
+      zone: ZoneId,
       xa: Transactor[F]
   ): F[Unit] =
     val now = Instant.now()
@@ -228,7 +228,7 @@ object Database:
       ) VALUES (
         $feedId,
         $now,
-        ${asText(now)},
+        ${asText(now, zone)},
         $method,
         $status,
         ${errorKind
@@ -238,7 +238,7 @@ object Database:
         $latency,
         $backoffIndex,
         $scheduled,
-        ${asText(scheduled)},
+        ${asText(scheduled, zone)},
         $debug
       )
     """.update.run.transact(xa).void
@@ -250,6 +250,7 @@ object Database:
       lastModified: Option[Instant],
       contentHash: Option[String],
       body: Array[Byte],
+      zone: ZoneId,
       xa: Transactor[F]
   ): F[Unit] =
     sql"""
@@ -260,10 +261,10 @@ object Database:
       VALUES (
         $feedId,
         $fetchedAt,
-        ${asText(fetchedAt)},
+        ${asText(fetchedAt, zone)},
         $etag,
         $lastModified,
-        ${asTextOpt(lastModified)},
+        ${asTextOpt(lastModified, zone)},
         $contentHash,
         $body
       )

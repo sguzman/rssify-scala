@@ -42,6 +42,7 @@ object Main extends IOApp {
             _ <- Database.migrate(xa)
             _ <- Database.upsertFeeds(
               cfg.feeds,
+              cfg.timezone,
               xa
             )
             _ <- Logger[IO].info(
