@@ -149,21 +149,25 @@ object Database:
       zone: ZoneId,
       xa: Transactor[F]
   ): F[Unit] =
-    feeds.traverse_ { feed =>
-      val now = Instant.now()
-      sql"""
+    val sql =
+      """
         INSERT OR IGNORE INTO feeds(
           id, url, domain, created_at, created_at_text
-        )
-        VALUES (
-          ${feed.id},
-          ${feed.url.toString},
-          ${feed.domain},
-          $now,
-          ${asText(now, zone)}
-        )
-      """.update.run.transact(xa).void
-    }
+        ) VALUES (?, ?, ?, ?, ?)
+      """
+    val now = Instant.now()
+    val rows = feeds.map(f =>
+      (
+        f.id,
+        f.url.toString,
+        f.domain,
+        now,
+        asText(now, zone)
+      )
+    )
+    Update[(String, String, String, Instant, String)](
+      sql
+    ).updateMany(rows).transact(xa).void
 
   final case class StateRow(
       feedId: String,
