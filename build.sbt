@@ -25,6 +25,7 @@ lazy val root = project
       "org.typelevel" %% "log4cats-slf4j" % "2.7.1",
       "ch.qos.logback" % "logback-classic" % "1.5.11",
       "com.indoorvivants" %% "toml" % "0.3.0",
+      "org.scala-lang.modules" %% "scala-xml" % "2.3.0",
       "org.typelevel" %% "munit-cats-effect" % "2.0.0" % Test
     ),
     scalacOptions ++= Seq(

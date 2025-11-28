@@ -9,6 +9,7 @@ import fs2.Stream
 import org.github.sguzman.rss.Logging
 import org.github.sguzman.rss.db.Database
 import org.github.sguzman.rss.http.HttpClient
+import org.github.sguzman.rss.feed.FeedParser
 import org.github.sguzman.rss.model.*
 import org.github.sguzman.rss.model.Hashing
 import org.github.sguzman.rss.time.Time
@@ -291,16 +292,25 @@ object Scheduler:
           )
           _ <- res.body.traverse_ { b =>
             val hash = Hashing.sha256(b)
-            Database.insertBody(
-              feed.id,
-              now,
-              res.etag,
-              res.lastModified,
-              Some(hash),
-              b,
-              cfg.timezone,
-              xa
-            )
+            FeedParser
+              .parse(b)
+              .fold(
+                err =>
+                  Logger[F].warn(
+                    s"Failed to parse feed ${feed.id}: ${err.getMessage}"
+                  ),
+                parsed =>
+                  Database.insertPayloadWithItems(
+                    feed.id,
+                    now,
+                    res.etag,
+                    res.lastModified,
+                    Some(hash),
+                    parsed,
+                    cfg.timezone,
+                    xa
+                  )
+              )
           }
           _ <- Database.insertState(
             updated,

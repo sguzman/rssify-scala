@@ -8,6 +8,7 @@ import doobie.hikari.HikariTransactor
 import doobie.util.transactor.Transactor
 import doobie.util.meta.Meta
 import org.github.sguzman.rss.model.*
+import org.github.sguzman.rss.feed.FeedParser
 import org.github.sguzman.rss.time.Time
 import org.typelevel.log4cats.Logger
 
@@ -107,7 +108,7 @@ object Database:
         )
       """.update.run,
       sql"""
-        CREATE TABLE IF NOT EXISTS feed_bodies(
+        CREATE TABLE IF NOT EXISTS feed_payloads(
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           feed_id TEXT NOT NULL REFERENCES feeds(id),
           fetched_at TIMESTAMP NOT NULL,
@@ -116,9 +117,32 @@ object Database:
           last_modified TIMESTAMP NULL,
           last_modified_text TEXT NULL,
           content_hash TEXT NULL,
-          body BLOB NOT NULL
+          title TEXT NULL,
+          link TEXT NULL,
+          description TEXT NULL,
+          language TEXT NULL,
+          updated_at TIMESTAMP NULL,
+          updated_at_text TEXT NULL
         )
-      """.update.run
+      """.update.run,
+      sql"""
+        CREATE TABLE IF NOT EXISTS feed_items(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          payload_id INTEGER NOT NULL REFERENCES feed_payloads(id) ON DELETE CASCADE,
+          feed_id TEXT NOT NULL REFERENCES feeds(id),
+          title TEXT NULL,
+          link TEXT NULL,
+          guid TEXT NULL,
+          author TEXT NULL,
+          published_at TIMESTAMP NULL,
+          published_at_text TEXT NULL,
+          updated_at TIMESTAMP NULL,
+          updated_at_text TEXT NULL,
+          summary TEXT NULL,
+          content TEXT NULL
+        )
+      """.update.run,
+      sql"DROP TABLE IF EXISTS feed_bodies".update.run
     )
     ddl.sequence_.transact(xa).void
 
@@ -243,32 +267,71 @@ object Database:
       )
     """.update.run.transact(xa).void
 
-  def insertBody[F[_]: Async](
+  def insertPayloadWithItems[F[_]: Async](
       feedId: String,
       fetchedAt: Instant,
       etag: Option[String],
       lastModified: Option[Instant],
       contentHash: Option[String],
-      body: Array[Byte],
+      parsed: FeedParser.ParsedFeed,
       zone: ZoneId,
       xa: Transactor[F]
   ): F[Unit] =
-    sql"""
-      INSERT INTO feed_bodies(
-        feed_id, fetched_at, fetched_at_text, etag,
-        last_modified, last_modified_text, content_hash, body
-      )
-      VALUES (
-        $feedId,
-        $fetchedAt,
-        ${asText(fetchedAt, zone)},
-        $etag,
-        $lastModified,
-        ${asTextOpt(lastModified, zone)},
-        $contentHash,
-        $body
-      )
-    """.update.run.transact(xa).void
+    val insertPayload: ConnectionIO[Long] =
+      sql"""
+        INSERT INTO feed_payloads(
+          feed_id, fetched_at, fetched_at_text, etag,
+          last_modified, last_modified_text, content_hash,
+          title, link, description, language,
+          updated_at, updated_at_text
+        ) VALUES (
+          $feedId,
+          $fetchedAt,
+          ${asText(fetchedAt, zone)},
+          $etag,
+          $lastModified,
+          ${asTextOpt(lastModified, zone)},
+          $contentHash,
+          ${parsed.metadata.title},
+          ${parsed.metadata.link},
+          ${parsed.metadata.description},
+          ${parsed.metadata.language},
+          ${parsed.metadata.updatedAt},
+          ${asTextOpt(parsed.metadata.updatedAt, zone)}
+        )
+      """.update
+        .withUniqueGeneratedKeys[Long]("id")
+
+    val insertItems: Long => ConnectionIO[Unit] =
+      payloadId =>
+        parsed.items.traverse_ { item =>
+          sql"""
+            INSERT INTO feed_items(
+              payload_id, feed_id, title, link, guid, author,
+              published_at, published_at_text,
+              updated_at, updated_at_text,
+              summary, content
+            ) VALUES (
+              $payloadId,
+              $feedId,
+              ${item.title},
+              ${item.link},
+              ${item.guid},
+              ${item.author},
+              ${item.publishedAt},
+              ${asTextOpt(item.publishedAt, zone)},
+              ${item.updatedAt},
+              ${asTextOpt(item.updatedAt, zone)},
+              ${item.summary},
+              ${item.content}
+            )
+          """.update.run.void
+        }
+
+    (for
+      payloadId <- insertPayload
+      _ <- insertItems(payloadId)
+    yield ()).transact(xa)
 
   def latestState[F[_]: Async](
       feedId: String,
