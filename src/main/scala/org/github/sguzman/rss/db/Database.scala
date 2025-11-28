@@ -55,6 +55,7 @@ object Database:
       xa: Transactor[F]
   ): F[Unit] =
     val ddl = List(
+      sql"PRAGMA journal_mode=WAL".update.run,
       sql"""
         CREATE TABLE IF NOT EXISTS feeds(
           id TEXT PRIMARY KEY,
@@ -146,6 +147,10 @@ object Database:
           jitter_seconds INTEGER NOT NULL
         )
       """.update.run,
+      sql"""
+        CREATE INDEX IF NOT EXISTS idx_feed_state_current_next_action
+        ON feed_state_current(next_action_at)
+      """.update.run,
       sql"DROP TABLE IF EXISTS feed_items".update.run,
       sql"""
         CREATE TABLE IF NOT EXISTS feed_items(
@@ -161,6 +166,14 @@ object Database:
           description TEXT NULL,
           summary TEXT NULL
         )
+      """.update.run,
+      sql"""
+        CREATE INDEX IF NOT EXISTS idx_feed_items_payload
+        ON feed_items(payload_id)
+      """.update.run,
+      sql"""
+        CREATE INDEX IF NOT EXISTS idx_feed_items_feed
+        ON feed_items(feed_id)
       """.update.run,
       sql"DROP TABLE IF EXISTS feed_bodies".update.run
     )

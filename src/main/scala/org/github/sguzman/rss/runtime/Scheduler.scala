@@ -23,6 +23,7 @@ import scala.concurrent.duration.*
 object Scheduler:
   private val tickInterval = 5.seconds
   private val dueBatchSize = 1000
+  private val defaultParallelism = 64
 
   def makeSemaphores[F[_]: Async](
       cfg: AppConfig
@@ -91,7 +92,11 @@ object Scheduler:
               cfg.timezone
             )}: ${due.size} feeds due"
       )
-      _ <- due.parTraverse_(feed =>
+      val parallelism =
+        cfg.globalMaxConcurrentRequests.getOrElse(
+          defaultParallelism
+        )
+      _ <- due.parTraverseN(parallelism)(feed =>
         processFeed(
           cfg,
           client,
