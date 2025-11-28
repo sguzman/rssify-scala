@@ -4,7 +4,6 @@ import cats.effect.kernel.{Async, Clock}
 import cats.effect.implicits.*
 import cats.effect.std.{Random, Semaphore}
 import cats.syntax.all.*
-import cats.syntax.parallel.*
 import fs2.Stream
 import org.github.sguzman.rss.db.Database
 import org.github.sguzman.rss.http.HttpClient
