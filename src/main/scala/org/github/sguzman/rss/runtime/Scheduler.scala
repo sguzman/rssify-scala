@@ -6,7 +6,6 @@ import cats.effect.std.{Random, Semaphore}
 import cats.syntax.all.*
 import cats.syntax.parallel.*
 import fs2.Stream
-import org.github.sguzman.rss.Logging
 import org.github.sguzman.rss.db.Database
 import org.github.sguzman.rss.http.HttpClient
 import org.github.sguzman.rss.feed.FeedParser
@@ -16,7 +15,6 @@ import org.github.sguzman.rss.time.Time
 import org.http4s.Status
 import org.http4s.Uri
 import org.http4s.client.Client
-import org.http4s.syntax.all.*
 import org.typelevel.log4cats.Logger
 
 import java.time.{Instant, ZoneId}
@@ -405,7 +403,7 @@ object Scheduler:
 
   private def combinedPermit[F[
       _
-  ]: Async](
+  ]](
       global: Option[Semaphore[F]],
       domain: Semaphore[F]
   ): cats.effect.Resource[F, Unit] =

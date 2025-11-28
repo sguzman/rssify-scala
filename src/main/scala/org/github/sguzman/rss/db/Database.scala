@@ -10,7 +10,6 @@ import doobie.util.meta.Meta
 import org.github.sguzman.rss.model.*
 import org.github.sguzman.rss.feed.FeedParser
 import org.github.sguzman.rss.time.Time
-import org.typelevel.log4cats.Logger
 
 import java.sql.Timestamp
 import java.time.{Instant, ZoneId}
@@ -146,7 +145,7 @@ object Database:
     )
     ddl.sequence_.transact(xa).void
 
-  def upsertFeeds[F[_]: Async: Logger](
+  def upsertFeeds[F[_]: Async](
       feeds: List[FeedConfig],
       zone: ZoneId,
       xa: Transactor[F]
