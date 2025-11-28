@@ -8,3 +8,4 @@ jitter_fraction = 0.2
 global_max_concurrent_requests = 16
 user_agent = "ScalaRssFetcher/1.0 (+https://example.org)"
 mode = "dev"
+timezone = "America/Mexico_City"

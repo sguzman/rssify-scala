@@ -7,6 +7,7 @@ import org.github.sguzman.rss.db.Database
 import org.github.sguzman.rss.http.HttpClient
 import org.github.sguzman.rss.model.AppMode
 import org.github.sguzman.rss.runtime.Scheduler
+import org.github.sguzman.rss.time.Time
 import org.typelevel.log4cats.Logger
 
 object Main extends IOApp {
@@ -21,6 +22,14 @@ object Main extends IOApp {
     val program = for
       cfg <- ConfigLoader.load[IO](
         cfgPath
+      )
+      _ <- IO(
+        Time.setDefaultTimezone(
+          cfg.timezone
+        )
+      )
+      _ <- Logger[IO].info(
+        s"Using timezone ${cfg.timezone}"
       )
       _ <- resetDbIfDev(cfg)
       _ <- Logger[IO].info(

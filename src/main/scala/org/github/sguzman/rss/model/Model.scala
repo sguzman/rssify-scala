@@ -37,6 +37,7 @@ final case class AppConfig(
     ],
     userAgent: String,
     mode: AppMode,
+    timezone: ZoneId,
     domains: Map[String, DomainConfig],
     feeds: List[FeedConfig]
 )

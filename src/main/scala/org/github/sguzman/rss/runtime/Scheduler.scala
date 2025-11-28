@@ -11,13 +11,14 @@ import org.github.sguzman.rss.db.Database
 import org.github.sguzman.rss.http.HttpClient
 import org.github.sguzman.rss.model.*
 import org.github.sguzman.rss.model.Hashing
+import org.github.sguzman.rss.time.Time
 import org.http4s.Status
 import org.http4s.Uri
 import org.http4s.client.Client
 import org.http4s.syntax.all.*
 import org.typelevel.log4cats.Logger
 
-import java.time.Instant
+import java.time.{Instant, ZoneId}
 import scala.concurrent.duration.*
 
 object Scheduler:
@@ -83,7 +84,11 @@ object Scheduler:
         xa
       )
       _ <- Logger[F].info(
-        s"Scheduler tick at $now: ${due.size} feeds due"
+        s"Scheduler tick at ${Time
+            .formatInstant(
+              now,
+              cfg.timezone
+            )}: ${due.size} feeds due"
       )
       _ <- due.parTraverse_(feed =>
         processFeed(
@@ -127,7 +132,11 @@ object Scheduler:
       action = LinkState
         .decideNextAction(state, now)
       _ <- Logger[F].debug(
-        s"Feed ${feed.id} action: $action at $now"
+        s"Feed ${feed.id} action: ${describeAction(action, cfg.timezone)} at ${Time
+            .formatInstant(
+              now,
+              cfg.timezone
+            )}"
       )
       _ <- action match
         case NextAction.SleepUntil(_) =>
@@ -392,3 +401,15 @@ object Scheduler:
           _ <- domain.permit
         yield ()
       case None => domain.permit
+
+  private def describeAction(
+      action: NextAction,
+      zone: ZoneId
+  ): String =
+    action match
+      case NextAction.SleepUntil(at) =>
+        s"sleep-until ${Time.formatInstant(at, zone)}"
+      case NextAction.DoHead(_) =>
+        "do-head"
+      case NextAction.DoGet(_) =>
+        "do-get"

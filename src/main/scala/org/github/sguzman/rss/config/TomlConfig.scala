@@ -8,6 +8,7 @@ import toml.{Codec, Toml}
 import toml.derivation.auto.*
 
 import java.net.URI
+import java.time.ZoneId
 
 final case class RawApp(
     db_path: String,
@@ -18,7 +19,8 @@ final case class RawApp(
     jitter_fraction: Double,
     global_max_concurrent_requests: Option[Int],
     user_agent: String,
-    mode: Option[String] = None
+    mode: Option[String] = None,
+    timezone: Option[String] = None
 )
 
 final case class RawAppFile(app: RawApp)
@@ -46,6 +48,9 @@ given Codec[RawFeed] = Codec.derived
 given Codec[RawFeedsFile] = Codec.derived
 
 object ConfigLoader {
+  private val defaultTimezone =
+    "America/Mexico_City"
+
   def load[F[_]: Sync](configPath: os.Path): F[AppConfig] = {
     val baseDir = configPath / os.up
     val domainsPath = baseDir / "domains.toml"
@@ -127,6 +132,7 @@ object ConfigLoader {
     val domains = rawDomains.domains
       .map(d => d.name -> DomainConfig(d.max_concurrent_requests))
       .toMap
+    val timezone = parseZone(rawApp.timezone)
     AppConfig(
       dbPath = dbOsPath.toNIO,
       defaultPollSeconds = rawApp.default_poll_seconds,
@@ -137,6 +143,7 @@ object ConfigLoader {
       globalMaxConcurrentRequests = rawApp.global_max_concurrent_requests,
       userAgent = rawApp.user_agent,
       mode = mode,
+      timezone = timezone,
       domains = domains,
       feeds = feeds
     )
@@ -151,5 +158,18 @@ object ConfigLoader {
           s"Invalid app.mode '$other' in config. Expected 'dev' or 'prod'."
         )
     }
+
+  private def parseZone(
+      rawZone: Option[String]
+  ): ZoneId =
+    val zoneStr =
+      rawZone.filter(_.nonEmpty).getOrElse(defaultTimezone)
+    try ZoneId.of(zoneStr)
+    catch
+      case e: Exception =>
+        throw IllegalArgumentException(
+          s"Invalid timezone '$zoneStr' in config. See java.time.ZoneId for valid values.",
+          e
+        )
 
 }
