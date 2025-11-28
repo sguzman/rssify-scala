@@ -29,11 +29,10 @@ object FeedParser:
       title: Option[String],
       link: Option[String],
       guid: Option[String],
-      author: Option[String],
       publishedAt: Option[Instant],
-      updatedAt: Option[Instant],
-      summary: Option[String],
-      content: Option[String]
+      category: Option[String],
+      description: Option[String],
+      summary: Option[String]
   )
 
   final case class ParsedFeed(
@@ -84,19 +83,19 @@ object FeedParser:
     val items = (channel \ "item").toList.map { item =>
       def itemText(name: String) =
         text(item \ name)
+      val categories =
+        (item \ "category").toList.flatMap(n => text(n))
       FeedItem(
         title = itemText("title"),
         link = itemText("link"),
         guid = itemText("guid").orElse(
           itemText("id")
         ),
-        author = itemText("author"),
         publishedAt = itemText("pubDate")
           .flatMap(parseDate),
-        updatedAt = itemText("updated")
-          .flatMap(parseDate),
-        summary = itemText("description"),
-        content = text(item \\ "encoded")
+        category = categories.headOption,
+        description = itemText("description"),
+        summary = text(item \\ "encoded")
           .orElse(itemText("content"))
       )
     }
@@ -113,17 +112,23 @@ object FeedParser:
     )
     val items =
       (xml \ "entry").toList.map { entry =>
+        val categories =
+          (entry \ "category").toList.flatMap { n =>
+            n.attribute("term")
+              .map(_.text.trim)
+              .filter(_.nonEmpty)
+              .orElse(text(n))
+          }
         FeedItem(
           title = text(entry \ "title"),
           link = extractAtomLink(entry),
           guid = text(entry \ "id"),
-          author = text(entry \ "author" \ "name"),
           publishedAt = text(entry \ "published")
             .flatMap(parseDate),
-          updatedAt = text(entry \ "updated")
-            .flatMap(parseDate),
-          summary = text(entry \ "summary"),
-          content = text(entry \ "content")
+          category = categories.headOption,
+          description = text(entry \ "summary")
+            .orElse(text(entry \ "content")),
+          summary = text(entry \ "content")
         )
       }
     ParsedFeed(meta, items)

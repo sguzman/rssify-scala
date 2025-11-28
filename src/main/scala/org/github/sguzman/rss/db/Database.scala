@@ -124,6 +124,7 @@ object Database:
           updated_at_text TEXT NULL
         )
       """.update.run,
+      sql"DROP TABLE IF EXISTS feed_items".update.run,
       sql"""
         CREATE TABLE IF NOT EXISTS feed_items(
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -132,13 +133,11 @@ object Database:
           title TEXT NULL,
           link TEXT NULL,
           guid TEXT NULL,
-          author TEXT NULL,
           published_at TIMESTAMP NULL,
           published_at_text TEXT NULL,
-          updated_at TIMESTAMP NULL,
-          updated_at_text TEXT NULL,
-          summary TEXT NULL,
-          content TEXT NULL
+          category TEXT NULL,
+          description TEXT NULL,
+          summary TEXT NULL
         )
       """.update.run,
       sql"DROP TABLE IF EXISTS feed_bodies".update.run
@@ -306,23 +305,20 @@ object Database:
         parsed.items.traverse_ { item =>
           sql"""
             INSERT INTO feed_items(
-              payload_id, feed_id, title, link, guid, author,
+              payload_id, feed_id, title, link, guid,
               published_at, published_at_text,
-              updated_at, updated_at_text,
-              summary, content
+              category, description, summary
             ) VALUES (
               $payloadId,
               $feedId,
               ${item.title},
               ${item.link},
               ${item.guid},
-              ${item.author},
               ${item.publishedAt},
               ${asTextOpt(item.publishedAt, zone)},
-              ${item.updatedAt},
-              ${asTextOpt(item.updatedAt, zone)},
-              ${item.summary},
-              ${item.content}
+              ${item.category},
+              ${item.description},
+              ${item.summary}
             )
           """.update.run.void
         }
