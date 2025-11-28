@@ -10,13 +10,18 @@ import org.github.sguzman.rss.model.*
 import org.typelevel.log4cats.Logger
 
 import java.time.Instant
-import java.sql.Timestamp
 import doobie.util.meta.Meta
+import org.github.sguzman.rss.time.Time
+import java.time.ZoneId
 
 given Meta[Instant] =
-  Meta[Timestamp].imap(_.toInstant)(
-    Timestamp.from
-  )
+  Meta[String]
+    .imap(Time.parseDbString)(instant =>
+      Time.instantToDbString(
+        instant,
+        ZoneId.systemDefault()
+      )
+    )
 
 object Database:
   def transactor[F[_]: Async](
@@ -44,26 +49,26 @@ object Database:
           id TEXT PRIMARY KEY,
           url TEXT NOT NULL,
           domain TEXT NOT NULL,
-          created_at TIMESTAMP NOT NULL
+          created_at TEXT NOT NULL
         )
       """.update.run,
       sql"""
         CREATE TABLE IF NOT EXISTS feed_state_history(
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           feed_id TEXT NOT NULL REFERENCES feeds(id),
-          recorded_at TIMESTAMP NOT NULL,
+          recorded_at TEXT NOT NULL,
           phase TEXT NOT NULL,
-          last_head_at TIMESTAMP NULL,
+          last_head_at TEXT NULL,
           last_head_status INTEGER NULL,
           last_head_error TEXT NULL,
-          last_get_at TIMESTAMP NULL,
+          last_get_at TEXT NULL,
           last_get_status INTEGER NULL,
           last_get_error TEXT NULL,
           etag TEXT NULL,
-          last_modified TIMESTAMP NULL,
+          last_modified TEXT NULL,
           backoff_index INTEGER NOT NULL,
           base_poll_seconds INTEGER NOT NULL,
-          next_action_at TIMESTAMP NOT NULL,
+          next_action_at TEXT NOT NULL,
           jitter_seconds INTEGER NOT NULL,
           note TEXT NULL
         )
@@ -72,13 +77,13 @@ object Database:
         CREATE TABLE IF NOT EXISTS fetch_events(
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           feed_id TEXT NOT NULL REFERENCES feeds(id),
-          event_time TIMESTAMP NOT NULL,
+          event_time TEXT NOT NULL,
           method TEXT NOT NULL,
           status INTEGER NULL,
           error_kind TEXT NULL,
           latency_ms INTEGER NULL,
           backoff_index INTEGER NOT NULL,
-          scheduled_next_action_at TIMESTAMP NOT NULL,
+          scheduled_next_action_at TEXT NOT NULL,
           debug TEXT NULL
         )
       """.update.run,
@@ -86,9 +91,9 @@ object Database:
         CREATE TABLE IF NOT EXISTS feed_bodies(
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           feed_id TEXT NOT NULL REFERENCES feeds(id),
-          fetched_at TIMESTAMP NOT NULL,
+          fetched_at TEXT NOT NULL,
           etag TEXT NULL,
-          last_modified TIMESTAMP NULL,
+          last_modified TEXT NULL,
           content_hash TEXT NULL,
           body BLOB NOT NULL
         )
