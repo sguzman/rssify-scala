@@ -55,6 +55,7 @@ object Database:
       xa: Transactor[F]
   ): F[Unit] =
     val ddl = List(
+      sql"PRAGMA journal_mode=WAL".query[String].unique.void,
       sql"""
         CREATE TABLE IF NOT EXISTS feeds(
           id TEXT PRIMARY KEY,
