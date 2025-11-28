@@ -124,6 +124,28 @@ object Database:
           updated_at_text TEXT NULL
         )
       """.update.run,
+      sql"""
+        CREATE TABLE IF NOT EXISTS feed_state_current(
+          feed_id TEXT PRIMARY KEY REFERENCES feeds(id),
+          phase TEXT NOT NULL,
+          last_head_at TIMESTAMP NULL,
+          last_head_at_text TEXT NULL,
+          last_head_status INTEGER NULL,
+          last_head_error TEXT NULL,
+          last_get_at TIMESTAMP NULL,
+          last_get_at_text TEXT NULL,
+          last_get_status INTEGER NULL,
+          last_get_error TEXT NULL,
+          etag TEXT NULL,
+          last_modified TIMESTAMP NULL,
+          last_modified_text TEXT NULL,
+          backoff_index INTEGER NOT NULL,
+          base_poll_seconds INTEGER NOT NULL,
+          next_action_at TIMESTAMP NOT NULL,
+          next_action_at_text TEXT NOT NULL,
+          jitter_seconds INTEGER NOT NULL
+        )
+      """.update.run,
       sql"DROP TABLE IF EXISTS feed_items".update.run,
       sql"""
         CREATE TABLE IF NOT EXISTS feed_items(
@@ -189,45 +211,97 @@ object Database:
       zone: ZoneId,
       xa: Transactor[F]
   ): F[Unit] =
-    sql"""
-      INSERT INTO feed_state_history(
-        feed_id, recorded_at, recorded_at_text, phase,
-        last_head_at, last_head_at_text, last_head_status, last_head_error,
-        last_get_at, last_get_at_text, last_get_status, last_get_error,
-        etag, last_modified, last_modified_text,
-        backoff_index, base_poll_seconds, next_action_at, next_action_at_text,
-        jitter_seconds, note
-      ) VALUES (
-        ${state.feedId},
-        $recordedAt,
-        ${asText(recordedAt, zone)},
-        ${state.phase.toString},
-        ${state.lastHeadAt},
-        ${asTextOpt(state.lastHeadAt, zone)},
-        ${state.lastHeadStatus.map(
-        _.code
-      )}, ${state.lastHeadError.map(
-        _.toString
-      )},
-        ${state.lastGetAt},
-        ${asTextOpt(state.lastGetAt, zone)},
-        ${state.lastGetStatus
-        .map(
+    val historyInsert =
+      sql"""
+        INSERT INTO feed_state_history(
+          feed_id, recorded_at, recorded_at_text, phase,
+          last_head_at, last_head_at_text, last_head_status, last_head_error,
+          last_get_at, last_get_at_text, last_get_status, last_get_error,
+          etag, last_modified, last_modified_text,
+          backoff_index, base_poll_seconds, next_action_at, next_action_at_text,
+          jitter_seconds, note
+        ) VALUES (
+          ${state.feedId},
+          $recordedAt,
+          ${asText(recordedAt, zone)},
+          ${state.phase.toString},
+          ${state.lastHeadAt},
+          ${asTextOpt(state.lastHeadAt, zone)},
+          ${state.lastHeadStatus.map(
           _.code
-        )}, ${state.lastGetError.map(
-        _.toString
-      )},
-        ${state.etag},
-        ${state.lastModified},
-        ${asTextOpt(state.lastModified, zone)},
-        ${state.backoffIndex},
-        ${state.basePollSeconds},
-        ${state.nextActionAt},
-        ${asText(state.nextActionAt, zone)},
-        ${state.jitterSeconds},
-        ${state.note}
-      )
-    """.update.run.transact(xa).void
+        )}, ${state.lastHeadError.map(
+          _.toString
+        )},
+          ${state.lastGetAt},
+          ${asTextOpt(state.lastGetAt, zone)},
+          ${state.lastGetStatus
+          .map(
+            _.code
+          )}, ${state.lastGetError.map(
+          _.toString
+        )},
+          ${state.etag},
+          ${state.lastModified},
+          ${asTextOpt(state.lastModified, zone)},
+          ${state.backoffIndex},
+          ${state.basePollSeconds},
+          ${state.nextActionAt},
+          ${asText(state.nextActionAt, zone)},
+          ${state.jitterSeconds},
+          ${state.note}
+        )
+      """.update.run
+
+    val currentUpsert =
+      sql"""
+        INSERT INTO feed_state_current(
+          feed_id, phase,
+          last_head_at, last_head_at_text, last_head_status, last_head_error,
+          last_get_at, last_get_at_text, last_get_status, last_get_error,
+          etag, last_modified, last_modified_text,
+          backoff_index, base_poll_seconds, next_action_at, next_action_at_text,
+          jitter_seconds
+        ) VALUES (
+          ${state.feedId},
+          ${state.phase.toString},
+          ${state.lastHeadAt},
+          ${asTextOpt(state.lastHeadAt, zone)},
+          ${state.lastHeadStatus.map(_.code)},
+          ${state.lastHeadError.map(_.toString)},
+          ${state.lastGetAt},
+          ${asTextOpt(state.lastGetAt, zone)},
+          ${state.lastGetStatus.map(_.code)},
+          ${state.lastGetError.map(_.toString)},
+          ${state.etag},
+          ${state.lastModified},
+          ${asTextOpt(state.lastModified, zone)},
+          ${state.backoffIndex},
+          ${state.basePollSeconds},
+          ${state.nextActionAt},
+          ${asText(state.nextActionAt, zone)},
+          ${state.jitterSeconds}
+        )
+        ON CONFLICT(feed_id) DO UPDATE SET
+          phase = excluded.phase,
+          last_head_at = excluded.last_head_at,
+          last_head_at_text = excluded.last_head_at_text,
+          last_head_status = excluded.last_head_status,
+          last_head_error = excluded.last_head_error,
+          last_get_at = excluded.last_get_at,
+          last_get_at_text = excluded.last_get_at_text,
+          last_get_status = excluded.last_get_status,
+          last_get_error = excluded.last_get_error,
+          etag = excluded.etag,
+          last_modified = excluded.last_modified,
+          last_modified_text = excluded.last_modified_text,
+          backoff_index = excluded.backoff_index,
+          base_poll_seconds = excluded.base_poll_seconds,
+          next_action_at = excluded.next_action_at,
+          next_action_at_text = excluded.next_action_at_text,
+          jitter_seconds = excluded.jitter_seconds
+      """.update.run
+
+    (historyInsert *> currentUpsert).transact(xa).void
 
   def insertEvent[F[_]: Async](
       feedId: String,
@@ -348,18 +422,23 @@ object Database:
   def dueFeeds[F[_]: Async](
       now: Instant,
       feeds: List[FeedConfig],
+      limit: Int,
       xa: Transactor[F]
   ): F[List[FeedConfig]] =
-    feeds.filterA { feed =>
-      latestState(feed.id, xa).map {
-        case None => true
-        case Some(row)
-            if row.nextActionAt
-              .isBefore(
-                now
-              ) || row.nextActionAt
-              .equals(now) =>
-          true
-        case _ => false
-      }
-    }
+    val feedMap =
+      feeds.map(f => f.id -> f).toMap
+    val query =
+      sql"""
+        SELECT f.id
+        FROM feeds f
+        LEFT JOIN feed_state_current s
+          ON s.feed_id = f.id
+        WHERE s.feed_id IS NULL
+          OR s.next_action_at <= $now
+        ORDER BY COALESCE(s.next_action_at, CURRENT_TIMESTAMP)
+        LIMIT $limit
+      """.query[String].to[List]
+
+    query
+      .transact(xa)
+      .map(_.flatMap(feedMap.get))

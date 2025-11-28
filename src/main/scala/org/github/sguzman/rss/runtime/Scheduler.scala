@@ -22,6 +22,7 @@ import scala.concurrent.duration.*
 
 object Scheduler:
   private val tickInterval = 5.seconds
+  private val dueBatchSize = 1000
 
   def makeSemaphores[F[_]: Async](
       cfg: AppConfig
@@ -80,6 +81,7 @@ object Scheduler:
       due <- Database.dueFeeds(
         now,
         cfg.feeds,
+        dueBatchSize,
         xa
       )
       _ <- Logger[F].info(
