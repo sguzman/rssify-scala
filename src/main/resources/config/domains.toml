@@ -1,11 +1,15 @@
 [[domains]]
 name = "hnrss.org"
-max_concurrent_requests = 4
+max_concurrent_requests = 1
 
 [[domains]]
 name = "xkcd.com"
-max_concurrent_requests = 2
+max_concurrent_requests = 1
 
 [[domains]]
 name = "govinfo.gov"
+max_concurrent_requests = 1
+
+[[domains]]
+name = "youtube.com"
 max_concurrent_requests = 1
