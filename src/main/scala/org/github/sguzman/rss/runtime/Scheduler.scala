@@ -92,10 +92,8 @@ object Scheduler:
               cfg.timezone
             )}: ${due.size} feeds due"
       )
-      val parallelism =
-        cfg.globalMaxConcurrentRequests.getOrElse(
-          defaultParallelism
-        )
+      parallelism = cfg.globalMaxConcurrentRequests
+        .getOrElse(defaultParallelism)
       _ <- due.parTraverseN(parallelism)(feed =>
         processFeed(
           cfg,
