@@ -1,14 +1,4 @@
 [[feeds]]
-id = "hn-frontpage"
-url = "https://hnrss.org/frontpage"
-base_poll_seconds = 120
-
-[[feeds]]
-id = "xkcd"
-url = "https://xkcd.com/rss.xml"
-base_poll_seconds = 180
-
-[[feeds]]
 id = "govinfo-bills"
 url = "https://www.govinfo.gov/rss/bills.xml"
 base_poll_seconds = 360
@@ -177,7 +167,6 @@ base_poll_seconds = 360
 id = "govinfo-usreports"
 url = "https://www.govinfo.gov/rss/usreports.xml"
 base_poll_seconds = 360
-
 
 [[feeds]]
 id = "uscourts-govinfo-alnd"
@@ -544,7 +533,6 @@ id = "uscourts-govinfo-wyd"
 url = "https://www.govinfo.gov/rss/uscourts-wyd.xml"
 base_poll_seconds = 360
 
-
 [[feeds]]
 id = "uscourts-govinfo-ca1"
 url = "https://www.govinfo.gov/rss/uscourts-ca1.xml"
@@ -609,7 +597,6 @@ base_poll_seconds = 360
 id = "uscourts-govinfo-ca13"
 url = "https://www.govinfo.gov/rss/uscourts-ca13.xml"
 base_poll_seconds = 360
-
 
 [[feeds]]
 id = "uscourts-govinfo-almb"

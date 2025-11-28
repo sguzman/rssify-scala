@@ -54,7 +54,7 @@ object ConfigLoader {
   def load[F[_]: Sync](configPath: os.Path): F[AppConfig] = {
     val baseDir = configPath / os.up
     val domainsPath = baseDir / "domains.toml"
-    val feedsPath = baseDir / "feeds.toml"
+    val feedsDir = baseDir / "feeds"
     for {
       appContent <- Sync[F].blocking(os.read(configPath))
       rawApp <- Sync[F]
@@ -82,19 +82,7 @@ object ConfigLoader {
             e
           )
         }
-      feedContent <- Sync[F].blocking(os.read(feedsPath))
-      rawFeeds <- Sync[F]
-        .fromEither(
-          Toml
-            .parseAs[RawFeedsFile](feedContent)
-            .leftMap(err => new RuntimeException(err.toString))
-        )
-        .adaptError { case e =>
-          new RuntimeException(
-            s"TOML parse error in feeds file: ${e.getMessage}",
-            e
-          )
-        }
+      rawFeeds <- loadAllFeeds[F](feedsDir)
       cfg <- Sync[F].delay(
         toAppConfig(rawApp.app, rawDomains, rawFeeds, configPath)
       )
@@ -148,6 +136,49 @@ object ConfigLoader {
       feeds = feeds
     )
   }
+
+  private def loadAllFeeds[F[_]: Sync](
+      feedsDir: os.Path
+  ): F[RawFeedsFile] =
+    for
+      files <- Sync[F].blocking {
+        if !os.exists(feedsDir) then
+          throw RuntimeException(
+            s"Feeds directory not found at $feedsDir"
+          )
+        os.list(feedsDir)
+          .filter(p =>
+            os.isFile(p) && p.ext
+              .toLowerCase == "toml"
+          )
+          .sortBy(_.toString)
+      }
+      _ <- Sync[F].raiseWhen(files.isEmpty)(
+        RuntimeException(
+          s"No feed files found in $feedsDir"
+        )
+      )
+      parsed <- files.traverse { path =>
+        Sync[F]
+          .fromEither(
+            Toml
+              .parseAs[RawFeedsFile](
+                os.read(path)
+              )
+              .leftMap(err =>
+                new RuntimeException(
+                  err.toString
+                )
+              )
+          )
+          .adaptError { case e =>
+            new RuntimeException(
+              s"TOML parse error in feeds file ${path.last}: ${e.getMessage}",
+              e
+            )
+          }
+      }
+    yield RawFeedsFile(parsed.flatMap(_.feeds))
 
   private def parseMode(rawMode: Option[String]): AppMode =
     rawMode.map(_.toLowerCase) match {

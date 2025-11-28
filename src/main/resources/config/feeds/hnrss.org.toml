@@ -1,0 +1,4 @@
+[[feeds]]
+id = "hn-frontpage"
+url = "https://hnrss.org/frontpage"
+base_poll_seconds = 120

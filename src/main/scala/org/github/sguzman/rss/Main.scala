@@ -15,7 +15,7 @@ object Main extends IOApp {
       args: List[String]
   ): IO[ExitCode] = {
     val defaultConfigPath =
-      os.pwd / "src" / "main" / "resources" / "config.toml"
+      os.pwd / "src" / "main" / "resources" / "config" / "config.toml"
     val cfgPath = args.headOption
       .map(p => os.Path(p, base = os.pwd))
       .getOrElse(defaultConfigPath)
