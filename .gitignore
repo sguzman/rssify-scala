@@ -34,4 +34,6 @@ metals.sbt
 .ivy2/
 .sbt-global/
 .sbtboot/
-
+.sbt
+*.txt
+*.log

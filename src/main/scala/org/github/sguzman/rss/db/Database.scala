@@ -55,7 +55,8 @@ object Database:
       xa: Transactor[F]
   ): F[Unit] =
     val ddl = List(
-      sql"PRAGMA journal_mode=WAL".update.run,
+      // PRAGMA returns a row in SQLite; run as a query to avoid "Query returns results" error.
+      sql"PRAGMA journal_mode=WAL".query[String].unique.map(_ => 1),
       sql"""
         CREATE TABLE IF NOT EXISTS feeds(
           id TEXT PRIMARY KEY,
